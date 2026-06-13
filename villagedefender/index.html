@@ -2,1961 +2,2257 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Village Defender</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Village Defender 3D</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { overflow: hidden; background: #111; display: flex; align-items: center; justify-content: center; height: 100vh; }
-canvas { display: block; image-rendering: pixelated; }
-#hud {
-  position: fixed; top: 10px; left: 10px; color: #fff; font: bold 13px 'Courier New', monospace;
-  text-shadow: 1px 1px 2px #000; pointer-events: none; z-index: 10;
-  background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 7px; padding: 8px 12px; backdrop-filter: blur(2px);
-  min-width: 190px;
-}
-#hud div { margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
-#hud .hud-icon {
-  display: inline-block; width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
-  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.35), inset 1px 1px 0 rgba(255,255,255,0.25);
-}
-#hud .hud-sep { border-top: 1px solid rgba(255,255,255,0.15); margin: 3px 0 2px; padding: 0; }
-#build-panel {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  display: none; background: rgba(0,0,0,0.85); border: 2px solid #888;
-  border-radius: 6px; padding: 10px 14px; z-index: 20;
-  font: bold 13px 'Courier New', monospace; color: #fff;
-}
-#build-panel .build-title { text-align: center; margin-bottom: 8px; color: #ffa; font-size: 15px; }
-#build-panel .build-buttons { display: flex; gap: 10px; }
-#build-panel .build-btn {
-  cursor: pointer; padding: 6px 8px; border: 2px solid #666; border-radius: 4px;
-  background: rgba(40,40,40,0.9); text-align: center; min-width: 90px;
-  transition: border-color 0.15s;
-}
-#build-panel .build-btn:hover { border-color: #ff0; }
-#build-panel .build-btn.selected { border-color: #0f0; background: rgba(0,80,0,0.5); }
-#build-panel .build-btn canvas { display: block; margin: 0 auto 4px auto; }
-#build-panel .build-btn .label { font-size: 11px; }
-#build-panel .build-btn .cost { font-size: 10px; color: #fa0; }
-#villager-menu {
-  display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.92); border: 2px solid #888; border-radius: 6px;
-  padding: 14px 18px; z-index: 30; font: bold 13px 'Courier New', monospace; color: #fff;
-  min-width: 200px;
-}
-#villager-menu .vm-title { text-align: center; margin-bottom: 8px; color: #ffa; font-size: 15px; }
-#villager-menu .vm-info { margin-bottom: 10px; color: #ccc; font-size: 12px; line-height: 1.6; }
-#villager-menu .vm-btn {
-  display: block; width: 100%; cursor: pointer; padding: 6px 8px; border: 2px solid #666;
-  border-radius: 4px; background: rgba(40,40,40,0.9); color: #fff;
-  font: bold 12px 'Courier New', monospace; text-align: left; margin-bottom: 6px;
-  transition: border-color 0.15s;
-}
-#villager-menu .vm-btn:hover { border-color: #ff0; }
-#villager-menu .vm-btn.vm-close { border-color: #844; color: #faa; }
-#villager-menu .vm-btn.vm-close:hover { border-color: #f44; }
-#building-menu {
-  display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  background: rgba(10,8,5,0.92); border: 2px solid #8a6b3e; border-radius: 6px;
-  padding: 14px 18px; z-index: 30; font: bold 13px 'Courier New', monospace; color: #fff;
-  min-width: 200px;
-}
-#building-menu .bm-title { text-align: center; margin-bottom: 6px; color: #dda; font-size: 15px; }
-#building-menu .bm-info { margin-bottom: 10px; color: #ccc; font-size: 12px; line-height: 1.6; }
-#building-menu .bm-btn {
-  display: block; width: 100%; cursor: pointer; padding: 6px 8px; border: 2px solid #666;
-  border-radius: 4px; background: rgba(40,40,40,0.9); color: #fff;
-  font: bold 12px 'Courier New', monospace; text-align: left; margin-bottom: 6px;
-  transition: border-color 0.15s;
-}
-#building-menu .bm-btn:hover { border-color: #ff0; }
-#building-menu .bm-btn.bm-salvage { border-color: #a64; color: #fca; }
-#building-menu .bm-btn.bm-salvage:hover { border-color: #fa0; }
-#building-menu .bm-btn.bm-close { border-color: #844; color: #faa; }
-#building-menu .bm-btn.bm-close:hover { border-color: #f44; }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{overflow:hidden;background:#000;font-family:'Courier New',monospace;}
+canvas{display:block;}
+#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:24px;height:24px;pointer-events:none;z-index:10;}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:white;mix-blend-mode:difference;}
+#crosshair::before{width:2px;height:24px;left:11px;top:0;}
+#crosshair::after{width:24px;height:2px;top:11px;left:0;}
+#compass{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;}
+#instructions{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:100;color:white;flex-direction:column;cursor:pointer;}
+#instructions h1{font-size:42px;margin-bottom:30px;color:#5a5;letter-spacing:4px;}
+#instructions .keys{text-align:left;line-height:2;font-size:16px;color:#ccc;}
+#instructions .keys span{color:#5a5;font-weight:bold;}
+#instructions .start{margin-top:30px;font-size:20px;color:#aaa;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}}
+#debug{position:fixed;top:48px;left:10px;color:white;font-size:12px;z-index:10;pointer-events:none;text-shadow:1px 1px 2px black;}
+#hearts{position:fixed;bottom:78px;left:50%;transform:translateX(-50%);display:flex;gap:2px;z-index:10;pointer-events:none;}
+.heart{width:36px;height:36px;}
+#hotbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:10;pointer-events:none;}
+.hb-slot{width:52px;height:52px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;position:relative;image-rendering:pixelated;}
+.hb-slot canvas{width:32px;height:32px;image-rendering:pixelated;}
+.hb-slot span{position:absolute;bottom:2px;right:4px;color:white;font-size:12px;font-weight:bold;text-shadow:1px 1px 1px #000;}
+#villager-menu{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.9);border:2px solid #888;border-radius:6px;padding:14px 18px;z-index:30;font:bold 13px 'Courier New',monospace;color:#fff;min-width:180px;cursor:default;}
+.vm-title{text-align:center;margin-bottom:10px;color:#ffa;font-size:15px;}
+.vm-btn{display:block;width:100%;cursor:pointer;padding:6px 8px;border:2px solid #666;border-radius:4px;background:rgba(40,40,40,0.9);color:#fff;font:bold 12px 'Courier New',monospace;text-align:left;margin-bottom:6px;transition:border-color 0.15s;}
+.vm-btn:hover{border-color:#ff0;}
+#build-menu{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:200;font-family:'Courier New',monospace;color:#fff;cursor:default;}
+#build-menu.open{display:flex;}
+.bm-header{font-size:28px;color:#5a5;letter-spacing:3px;margin-bottom:30px;font-weight:bold;}
+.bm-items{display:flex;gap:20px;margin-bottom:30px;}
+.bm-item{border:2px solid #555;border-radius:8px;padding:12px;background:rgba(30,30,30,0.9);cursor:pointer;text-align:center;transition:border-color 0.2s;}
+.bm-item:hover{border-color:#5a5;}
+.bm-item canvas{display:block;margin:0 auto 8px;image-rendering:pixelated;}
+.bm-label{font-size:14px;color:#fff;font-weight:bold;}
+.bm-desc{font-size:11px;color:#aaa;margin:6px 0;line-height:1.4;max-width:160px;}
+.bm-cost{font-size:12px;color:#fa0;margin-top:4px;}
 </style>
 </head>
 <body>
-<div id="hud">
-  <div id="hud-day" style="font-size:15px;color:#ffd96a;margin-bottom:2px">Day 1</div>
-  <div id="hud-phase" style="color:#aaddff;font-size:11px;letter-spacing:1px"></div>
-  <div id="hud-time" style="color:#ccc;font-size:11px"></div>
-  <div class="hud-sep"></div>
-  <div id="hud-wood"><span class="hud-icon" style="background:#7a4a18"></span><span>Wood: 0</span></div>
-  <div id="hud-stone"><span class="hud-icon" style="background:#888"></span><span>Stone: 0</span></div>
-  <div id="hud-iron"><span class="hud-icon" style="background:#c89a30"></span><span>Iron: 0</span></div>
-  <div class="hud-sep"></div>
-  <div id="hud-villagers" style="color:#aaffaa"><span class="hud-icon" style="background:#4a8a4a"></span><span>Villagers: 8</span></div>
-  <div id="hud-enemies" style="color:#ff8888"></div>
-  <div id="hud-pos" style="color:#777;font-size:10px"></div>
+<div id="crosshair"></div>
+<canvas id="compass" width="700" height="40"></canvas>
+<div id="debug"></div>
+<div id="hearts"></div>
+<div id="hotbar">
+  <div class="hb-slot"><canvas id="hb-wood" width="16" height="16"></canvas><span id="hb-wood-ct">0</span></div>
+  <div class="hb-slot"><canvas id="hb-stone" width="16" height="16"></canvas><span id="hb-stone-ct">0</span></div>
 </div>
-<div id="building-menu"></div>
-<div id="villager-menu">
-  <div class="vm-title" id="vm-title">Villager #0</div>
-  <div class="vm-info" id="vm-info"></div>
-  <button class="vm-btn" id="vm-gather">Send to Gather</button>
-  <button class="vm-btn" id="vm-upgrade-stone" style="display:none">Upgrade: Stone Miner (3 wood)</button>
-  <button class="vm-btn" id="vm-upgrade-warrior" style="display:none">Upgrade: Warrior (5 wood)</button>
-  <button class="vm-btn vm-close" id="vm-close">Close</button>
+<div id="villager-menu" style="display:none;">
+  <div class="vm-title">Villager</div>
+  <button class="vm-btn" id="vm-chop">Chop nearest tree</button>
+  <button class="vm-btn" id="vm-build">Help build</button>
+  <button class="vm-btn" id="vm-close">Close</button>
 </div>
-<div id="build-panel">
-  <div class="build-title">BUILD MODE (E to close)</div>
-  <div class="build-buttons" id="build-buttons"></div>
+<div id="build-menu">
+  <div class="bm-header">BUILD MENU</div>
+  <div class="bm-items">
+    <div class="bm-item" id="bm-treefarm">
+      <div class="bm-label">Tree Farm</div>
+      <div class="bm-desc">Infinite wood source. Villagers harvest 2 wood each trip. Tree regrows instantly.</div>
+      <div class="bm-cost">10 wood</div>
+    </div>
+    <div class="bm-item" id="bm-wall">
+      <div class="bm-label">Wall</div>
+      <div class="bm-desc">6-block wide, 6-block tall plank wall. Blocks zombies from entering the village.</div>
+      <div class="bm-cost">5 wood</div>
+    </div>
+    <div class="bm-item" id="bm-gate">
+      <div class="bm-label">Gate</div>
+      <div class="bm-desc">Wall with doors in the center. Lets villagers through but blocks zombies.</div>
+      <div class="bm-cost">5 wood</div>
+    </div>
+  </div>
+  <button class="vm-btn" id="bm-close">Close [X]</button>
 </div>
-<canvas id="game"></canvas>
-<script>
-var TILE = 32;
-var MAP_W = 50, MAP_H = 50;
-var WORLD_W = MAP_W * TILE, WORLD_H = MAP_H * TILE;
-var DAY_LENGTH = 120, NIGHT_LENGTH = 60;
-var ZOOM = 2;
-var INTERACT_RADIUS = 5 * TILE;
+<div id="night-msg" style="display:none;position:fixed;top:35%;left:50%;transform:translate(-50%,-50%);font-size:36px;color:#ffdd33;font-family:'Courier New',monospace;font-weight:bold;text-shadow:2px 2px 4px #000;z-index:50;pointer-events:none;"></div>
+<div id="no-mats-msg" style="display:none;position:fixed;top:60%;left:50%;transform:translate(-50%,-50%);font-size:20px;color:#ff4444;font-family:'Courier New',monospace;font-weight:bold;text-shadow:1px 1px 3px #000;z-index:210;pointer-events:none;">Not enough materials!</div>
+<div id="damage-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,0,0,0.3);z-index:5;pointer-events:none;"></div>
+<div id="night-counter" style="position:fixed;top:48px;right:10px;color:#fff;font:bold 14px 'Courier New',monospace;z-index:10;pointer-events:none;text-shadow:1px 1px 2px #000;">Night: 0</div>
+<div id="instructions">
+  <h1>VILLAGE DEFENDER 3D</h1>
+  <div class="keys">
+    <span>W A S D</span> — Move<br>
+    <span>SPACE</span> — Jump / <span>SHIFT</span> — Sprint<br>
+    <span>Mouse</span> — Look<br>
+    <span>Left Click</span> — Attack zombie / Chop tree<br>
+    <span>Right Click</span> — Open doors / Villager menu<br>
+    <span>E</span> — Build menu / <span>X</span> — Close menu<br>
+  </div>
+  <div class="start">Click anywhere to play</div>
+</div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
 
-var canvas = document.getElementById('game');
-var ctx = canvas.getContext('2d');
+const BLOCK={AIR:0,GRASS:1,DIRT:2,STONEBRICK:3,COBBLE:4,WOOD:5,PLANKS:6,DOOR:7,BED:8,LEAVES:9,STONE:10};
+const MAX_BLOCK_ID=10;
+const BR=0.82;
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+function createBlockTexture(type,face){
+  const c=document.createElement('canvas');c.width=16;c.height=16;
+  const ctx=c.getContext('2d');
+  const rng=(seed)=>{let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;}};
+  switch(type){
+    case BLOCK.GRASS:{if(face==='top'){ctx.fillStyle='#5a8c28';ctx.fillRect(0,0,16,16);const r=rng(42);for(let i=0;i<30;i++){const s=Math.floor(r()*40)-20;ctx.fillStyle=`rgb(${90+s},${140+s},${40+s})`;ctx.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}}else if(face==='bottom'){ctx.fillStyle='#8b6914';ctx.fillRect(0,0,16,16);const r=rng(77);for(let i=0;i<20;i++){const s=Math.floor(r()*30)-15;ctx.fillStyle=`rgb(${139+s},${105+s},${20+s})`;ctx.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}}else{ctx.fillStyle='#8b6914';ctx.fillRect(0,0,16,16);ctx.fillStyle='#5a8c28';ctx.fillRect(0,0,16,3);const r=rng(101);for(let i=0;i<15;i++){const s=Math.floor(r()*30)-15;ctx.fillStyle=`rgb(${139+s},${105+s},${20+s})`;ctx.fillRect(Math.floor(r()*16),3+Math.floor(r()*13),1,1);}}break;}
+    case BLOCK.DIRT:{ctx.fillStyle='#8b6914';ctx.fillRect(0,0,16,16);const r=rng(55);for(let i=0;i<25;i++){const s=Math.floor(r()*30)-15;ctx.fillStyle=`rgb(${139+s},${105+s},${20+s})`;ctx.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}break;}
+    case BLOCK.STONEBRICK:{ctx.fillStyle='#8a8a8a';ctx.fillRect(0,0,16,16);const r=rng(71);ctx.fillStyle='#6e6e6e';ctx.fillRect(0,0,16,1);ctx.fillRect(0,4,16,1);ctx.fillRect(0,8,16,1);ctx.fillRect(0,12,16,1);ctx.fillRect(0,0,1,4);ctx.fillRect(8,0,1,4);ctx.fillRect(0,8,1,4);ctx.fillRect(8,8,1,4);ctx.fillRect(4,4,1,4);ctx.fillRect(12,4,1,4);ctx.fillRect(4,12,1,4);ctx.fillRect(12,12,1,4);for(let i=0;i<30;i++){const v=130+Math.floor(r()*20)-10;ctx.fillStyle=`rgb(${v},${v},${v})`;ctx.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}break;}
+    case BLOCK.COBBLE:{ctx.fillStyle='#777';ctx.fillRect(0,0,16,16);ctx.fillStyle='#999';ctx.fillRect(1,1,6,5);ctx.fillRect(9,1,5,4);ctx.fillRect(0,7,5,4);ctx.fillRect(7,6,7,5);ctx.fillRect(2,12,5,3);ctx.fillRect(9,12,6,4);ctx.fillStyle='#666';ctx.fillRect(0,0,16,1);ctx.fillRect(0,6,16,1);ctx.fillRect(0,11,16,1);ctx.fillRect(7,0,1,6);ctx.fillRect(5,6,1,5);ctx.fillRect(8,11,1,5);break;}
+    case BLOCK.WOOD:{if(face==='top'||face==='bottom'){
+      // Tree ring cross-section
+      ctx.fillStyle='#8a6b3e';ctx.fillRect(0,0,16,16);
+      ctx.fillStyle='#7a5b2e';ctx.beginPath();ctx.arc(8,8,6,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#8a6b3e';ctx.beginPath();ctx.arc(8,8,4,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#7a5b2e';ctx.beginPath();ctx.arc(8,8,2,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#6b4c20';ctx.fillRect(7,7,2,2);
+      // Outer bark ring
+      ctx.fillStyle='#5a3a1a';for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const bx=8+Math.cos(a)*7,by=8+Math.sin(a)*7;ctx.fillRect(bx,by,1,1);}
+    }else{
+      // Bark texture — lighter, more natural
+      ctx.fillStyle='#7a5a30';ctx.fillRect(0,0,16,16);
+      const r=rng(44);
+      // Bark strips of varying width and shade
+      for(let x=0;x<16;x+=2+Math.floor(r()*2)){const w=1+Math.floor(r()*2);const sh=Math.floor(r()*25);
+        ctx.fillStyle=`rgb(${95+sh},${75+sh},${45+sh})`;ctx.fillRect(x,0,w,16);}
+      // Dark crevices
+      ctx.fillStyle='#5a4020';
+      ctx.fillRect(3,0,1,16);ctx.fillRect(9,0,1,16);ctx.fillRect(14,0,1,16);
+      // Knots
+      ctx.fillStyle='#6a4a28';ctx.fillRect(5,4,3,3);ctx.fillRect(11,10,2,2);
+      // Subtle highlights
+      ctx.fillStyle='#9a7a48';
+      for(let i=0;i<8;i++){ctx.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}
+    }break;}
+    case BLOCK.PLANKS:{ctx.fillStyle='rgb(184,152,88)';ctx.fillRect(0,0,16,16);ctx.fillStyle='rgb(160,128,64)';ctx.fillRect(0,4,16,1);ctx.fillRect(0,8,16,1);ctx.fillRect(0,12,16,1);ctx.fillRect(4,0,1,4);ctx.fillRect(12,0,1,4);ctx.fillRect(8,5,1,3);ctx.fillRect(2,9,1,3);ctx.fillRect(14,9,1,3);ctx.fillRect(6,13,1,3);ctx.fillRect(10,13,1,3);const r=rng(50);for(let i=0;i<15;i++){const s=Math.floor(r()*20)-10;ctx.fillStyle=`rgb(${Math.min(255,184+s)},${Math.min(255,152+s)},${Math.min(255,88+s)})`;ctx.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}break;}
+    case BLOCK.DOOR:{
+      if(face==='top'){
+        // Door edge — plain vertical wood grain (shows on thin side when open)
+        ctx.fillStyle='#6b5330';ctx.fillRect(0,0,16,16);
+        ctx.fillStyle='#7a6038';ctx.fillRect(2,0,3,16);ctx.fillRect(8,0,3,16);ctx.fillRect(13,0,2,16);
+        ctx.fillStyle='#5a4220';ctx.fillRect(0,0,1,16);ctx.fillRect(15,0,1,16);
+      }
+      else if(face==='bottom'){
+        ctx.fillStyle='#5a4220';ctx.fillRect(0,0,16,16);
+        ctx.fillStyle='#6b5330';ctx.fillRect(2,0,3,16);ctx.fillRect(8,0,3,16);ctx.fillRect(13,0,2,16);
+        ctx.fillStyle='#4a3518';ctx.fillRect(0,0,1,16);ctx.fillRect(15,0,1,16);
+      }
+      else{ctx.fillStyle='#8a6b3e';ctx.fillRect(0,0,16,16);ctx.fillStyle='#5a3a1a';ctx.fillRect(0,0,2,16);ctx.fillRect(14,0,2,16);ctx.fillRect(0,0,16,2);ctx.fillRect(0,14,16,2);ctx.fillRect(2,7,12,2);ctx.fillStyle='#7a5a2e';ctx.fillRect(3,3,10,3);ctx.fillRect(3,10,10,3);ctx.fillStyle='#333';ctx.fillRect(11,8,2,2);ctx.fillStyle='#555';ctx.fillRect(11,8,1,1);}break;}
+    case BLOCK.BED:{
+      if(face==='top'){ctx.fillStyle='#aa2222';ctx.fillRect(0,0,16,16);ctx.fillStyle='#ddd';ctx.fillRect(2,1,12,5);ctx.fillStyle='#ccc';ctx.fillRect(3,2,10,3);ctx.fillStyle='#881818';ctx.fillRect(0,8,16,1);ctx.fillRect(0,12,16,1);}
+      else if(face==='bottom'){ctx.fillStyle='#5a4220';ctx.fillRect(0,0,16,16);ctx.fillStyle='#6b5330';ctx.fillRect(0,2,16,2);ctx.fillRect(0,7,16,2);ctx.fillRect(0,12,16,2);}
+      else{ctx.fillStyle='#6b5330';ctx.fillRect(0,0,16,16);ctx.fillStyle='#5a4220';ctx.fillRect(0,0,2,16);ctx.fillRect(14,0,2,16);ctx.fillStyle='#aa2222';ctx.fillRect(2,0,12,8);ctx.fillStyle='#881818';ctx.fillRect(2,4,12,1);}break;}
+    case BLOCK.LEAVES:{const r=rng(66);for(let py=0;py<16;py++){for(let px=0;px<16;px++){const f=((px+py)%2===0)?0.85:0.7;if(r()<f){const s=Math.floor(r()*30)-15;ctx.fillStyle=`rgb(${50+s},${115+s},${28+s})`;ctx.fillRect(px,py,1,1);}}}break;}
+    case BLOCK.STONE:{
+      // Smooth stone: medium gray base with subtle patches, deliberate cracks, minimal noise
+      ctx.fillStyle='#929292';ctx.fillRect(0,0,16,16);
+      // Subtle large patches of slightly different gray
+      ctx.fillStyle='#8a8a8a';ctx.fillRect(1,1,5,4);
+      ctx.fillStyle='#9a9a9a';ctx.fillRect(8,2,6,5);
+      ctx.fillStyle='#8e8e8e';ctx.fillRect(2,9,7,5);
+      ctx.fillStyle='#969696';ctx.fillRect(10,10,5,4);
+      ctx.fillStyle='#8c8c8c';ctx.fillRect(0,6,4,3);
+      // Deliberate crack lines
+      ctx.fillStyle='#787878';
+      ctx.fillRect(3,0,1,1);ctx.fillRect(4,1,1,1);ctx.fillRect(4,2,1,1);ctx.fillRect(5,3,1,1);ctx.fillRect(5,4,1,1);
+      ctx.fillRect(10,8,1,1);ctx.fillRect(11,9,1,1);ctx.fillRect(12,9,1,1);ctx.fillRect(12,10,1,1);
+      ctx.fillRect(1,13,1,1);ctx.fillRect(2,14,1,1);ctx.fillRect(3,14,1,1);ctx.fillRect(4,15,1,1);
+      // Minimal noise dots (just a few)
+      const r=rng(33);
+      for(let i=0;i<8;i++){const v=140+Math.floor(r()*12)-6;ctx.fillStyle=`rgb(${v},${v},${v})`;ctx.fillRect(Math.floor(r()*16),Math.floor(r()*16),1,1);}
+      break;}
+  }return c;
 }
-resize();
-window.addEventListener('resize', resize);
 
-var T = { GRASS: 0, DIRT: 1, STONE_PATH: 2, WATER: 3, WALL_BOUNDARY: 4 };
+const ATLAS_SIZE=16,atlasCanvas=document.createElement('canvas');atlasCanvas.width=ATLAS_SIZE*16;atlasCanvas.height=ATLAS_SIZE*16;
+const atlasCtx=atlasCanvas.getContext('2d'),textureMap={};let atlasIdx=0;
+for(let t=1;t<=MAX_BLOCK_ID;t++){textureMap[t]={};for(const f of['top','bottom','side']){const tex=createBlockTexture(t,f);const ax=(atlasIdx%ATLAS_SIZE)*16,ay=Math.floor(atlasIdx/ATLAS_SIZE)*16;atlasCtx.drawImage(tex,ax,ay);textureMap[t][f]=[ax/atlasCanvas.width,ay/atlasCanvas.height];atlasIdx++;}}
+const atlasTexture=new THREE.CanvasTexture(atlasCanvas);atlasTexture.magFilter=THREE.NearestFilter;atlasTexture.minFilter=THREE.NearestFilter;atlasTexture.flipY=false;atlasTexture.colorSpace=THREE.SRGBColorSpace;
+const blockMaterial=new THREE.MeshBasicMaterial({map:atlasTexture,vertexColors:true,side:THREE.DoubleSide,alphaTest:0.5});
 
-var map = [];
-for (var y = 0; y < MAP_H; y++) {
-  map[y] = [];
-  for (var x = 0; x < MAP_W; x++) {
-    if (x <= 1 || y <= 1 || x >= MAP_W - 2 || y >= MAP_H - 2) {
-      map[y][x] = T.WATER;
-    } else {
-      map[y][x] = T.GRASS;
+// ============================================================
+// AUDIO — procedural footsteps and mining sounds via Web Audio API
+// ============================================================
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function resumeAudio(){if(audioCtx.state==='suspended')audioCtx.resume();}
+document.addEventListener('click',resumeAudio,{once:true});
+
+function playFootstep(type){
+  const osc=audioCtx.createOscillator();
+  const gain=audioCtx.createGain();
+  const noise=audioCtx.createBufferSource();
+  const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.06,audioCtx.sampleRate);
+  const data=buf.getChannelData(0);
+  for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1);
+  noise.buffer=buf;
+  const filter=audioCtx.createBiquadFilter();
+  filter.type='lowpass';
+
+  if(type==='grass'){filter.frequency.value=600;gain.gain.value=0.04;}
+  else if(type==='dirt'){filter.frequency.value=500;gain.gain.value=0.05;}
+  else if(type==='planks'){filter.frequency.value=1200;gain.gain.value=0.04;osc.frequency.value=180;osc.type='square';}
+  else if(type==='stone'){filter.frequency.value=2000;gain.gain.value=0.05;}
+  else{filter.frequency.value=700;gain.gain.value=0.03;}
+
+  noise.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(gain.gain.value,audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);
+  noise.start();noise.stop(audioCtx.currentTime+0.08);
+
+  if(type==='planks'){
+    const g2=audioCtx.createGain();g2.gain.value=0.02;
+    osc.connect(g2);g2.connect(audioCtx.destination);
+    g2.gain.setValueAtTime(0.04,audioCtx.currentTime);
+    g2.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05);
+    osc.start();osc.stop(audioCtx.currentTime+0.05);
+  }
+}
+
+function playChopSound(type){
+  const noise=audioCtx.createBufferSource();
+  const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*0.15,audioCtx.sampleRate);
+  const data=buf.getChannelData(0);
+  for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.max(0,1-i/data.length);
+  noise.buffer=buf;
+  const filter=audioCtx.createBiquadFilter();
+  const gain=audioCtx.createGain();
+  filter.type='bandpass';
+  if(type==='wood'){filter.frequency.value=400;filter.Q.value=2;gain.gain.value=0.15;}
+  else{filter.frequency.value=2500;filter.Q.value=3;gain.gain.value=0.12;}
+  noise.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(gain.gain.value,audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.15);
+  noise.start();noise.stop(audioCtx.currentTime+0.15);
+}
+
+// Hit sound for player attacking zombie
+function playHitSound() {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 150;
+  gain.gain.value = 0.06;
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+}
+
+// Ambient sounds
+let ambientTimer = 0;
+function updateAmbientAudio(dt) {
+  ambientTimer += dt;
+  if (ambientTimer < 8) return;
+  ambientTimer = 0;
+  if (Math.random() > 0.4) return;
+
+  const isNight = worldTime >= DAY_LENGTH;
+  if (!isNight) {
+    // Soft ambient bird chirp (distant, not the same as bird entity chirps)
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 800 + Math.random() * 400;
+    gain.gain.value = 0.008;
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+    // Second chirp
+    setTimeout(() => {
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.value = 900 + Math.random() * 300;
+      gain2.gain.value = 0.015;
+      osc2.connect(gain2); gain2.connect(audioCtx.destination);
+      gain2.gain.setValueAtTime(0.015, audioCtx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      osc2.start(); osc2.stop(audioCtx.currentTime + 0.1);
+    }, 120);
+  } else {
+    // Cricket chirp
+    const noise = audioCtx.createBufferSource();
+    const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.08, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.sin(i * 0.3) * (Math.random() * 0.5 + 0.5) * Math.max(0, 1 - i/data.length);
+    noise.buffer = buf;
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0.015;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass'; filter.frequency.value = 4000; filter.Q.value = 5;
+    noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+    noise.start(); noise.stop(audioCtx.currentTime + 0.08);
+  }
+}
+
+// Zombie groan sound
+let zombieGroanTimer = 0;
+function updateZombieGroans(dt) {
+  if (zombies.length === 0) return;
+  zombieGroanTimer += dt;
+  if (zombieGroanTimer < 5) return;
+  zombieGroanTimer = 0;
+  if (Math.random() > 0.4) return;
+  // Find nearest zombie
+  let nearDist = Infinity;
+  for (const z of zombies) {
+    const d = Math.sqrt((z.x-player.pos.x)**2 + (z.z-player.pos.z)**2);
+    if (d < nearDist) nearDist = d;
+  }
+  if (nearDist > 30) return;
+  const vol = Math.max(0.005, 0.03 * (1 - nearDist/30));
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.value = 60 + Math.random() * 30;
+  gain.gain.value = vol;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 200;
+  osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+}
+
+function getFootstepType(wx,wz){
+  const b=getBlock(wx,1,wz);
+  if(b===BLOCK.GRASS||b===BLOCK.LEAVES)return'grass';
+  if(b===BLOCK.DIRT)return'dirt';
+  if(b===BLOCK.PLANKS||b===BLOCK.WOOD)return'planks';
+  if(b===BLOCK.STONEBRICK||b===BLOCK.COBBLE||b===BLOCK.STONE)return'stone';
+  return'grass';
+}
+
+let playerStepTimer=0;
+let villagerStepTimers=[];
+const tileU=16/atlasCanvas.width,tileV=16/atlasCanvas.height;
+const CHUNK_SIZE=16,WORLD_HEIGHT=16,RENDER_DIST=8,GROUND_LEVEL=1;
+const WORLD_SEED=Math.floor(Math.random()*2147483647);
+
+// Draw hotbar icons
+const woodIcon=document.getElementById('hb-wood');
+woodIcon.getContext('2d').drawImage(createBlockTexture(BLOCK.WOOD,'side'),0,0);
+const stoneIcon=document.getElementById('hb-stone');
+stoneIcon.getContext('2d').drawImage(createBlockTexture(BLOCK.STONE,'side'),0,0);
+
+// (Build menu uses text descriptions instead of icons)
+
+// Draw hearts
+const heartsDiv=document.getElementById('hearts');
+for(let i=0;i<5;i++){
+  const hc=document.createElement('canvas');hc.width=36;hc.height=36;hc.className='heart';
+  const hctx=hc.getContext('2d');
+  // Black outline (draw slightly larger heart in black first)
+  hctx.fillStyle='#000';
+  hctx.fillRect(4,2,6,2);hctx.fillRect(14,2,6,2);
+  hctx.fillRect(2,4,20,2);
+  hctx.fillRect(2,4,2,8);hctx.fillRect(20,4,2,8);
+  hctx.fillRect(0,6,2,6);hctx.fillRect(22,6,2,6);
+  hctx.fillRect(0,6,24,2);
+  hctx.fillRect(0,8,24,4);
+  hctx.fillRect(2,12,20,2);
+  hctx.fillRect(4,14,16,2);
+  hctx.fillRect(6,16,12,2);
+  hctx.fillRect(8,18,8,2);
+  hctx.fillRect(10,20,4,2);
+  // Red fill (inner heart)
+  hctx.fillStyle='#cc1111';
+  hctx.fillRect(4,4,6,2);hctx.fillRect(14,4,6,2);
+  hctx.fillRect(2,6,20,2);
+  hctx.fillRect(2,8,20,4);
+  hctx.fillRect(4,12,16,2);
+  hctx.fillRect(6,14,12,2);
+  hctx.fillRect(8,16,8,2);
+  hctx.fillRect(10,18,4,2);
+  // Highlight (top-left of each bump)
+  hctx.fillStyle='#ff4444';
+  hctx.fillRect(4,4,4,2);hctx.fillRect(14,4,4,2);
+  hctx.fillRect(2,6,4,2);
+  heartsDiv.appendChild(hc);
+}
+
+// ============================================================
+// VILLAGE LAYOUT — procedurally generated
+// ============================================================
+function generateVillage() {
+  const houses = [];
+  let vseed = WORLD_SEED;
+  const vr = () => { vseed = (vseed * 16807 + 11) % 2147483647; return vseed / 2147483647; };
+
+  // Candidate spots: place house adjacent to road, door facing road, 0-1 block gap
+  // Strategy: sample points along roads, then offset the house perpendicular to the road
+  const candidates = [];
+
+  // Along main N/S road (x=-1..1): house to the east or west
+  for (let z = -35; z <= 35; z += 7) {
+    if (Math.abs(z) < 8) continue; // skip village square area
+    const gap = Math.floor(vr() * 2); // 0 or 1 block gap
+    // East side: house at x=2+gap, door on x- facing road
+    candidates.push({ x: 2 + gap, z: z - 2, doorWall: 'x-' });
+    // West side: house at x=-7-gap, door on x+ facing road
+    candidates.push({ x: -7 - gap, z: z - 2, doorWall: 'x+' });
+  }
+  // Along main E/W road (z=-1..1): house to the north or south
+  for (let x = -35; x <= 35; x += 7) {
+    if (Math.abs(x) < 8) continue;
+    const gap = Math.floor(vr() * 2);
+    // South side: house at z=2+gap, door on z- facing road
+    candidates.push({ x: x - 2, z: 2 + gap, doorWall: 'z-' });
+    // North side: house at z=-7-gap, door on z+ facing road
+    candidates.push({ x: x - 2, z: -7 - gap, doorWall: 'z+' });
+  }
+  // Along primary branches at z=±14: house above or below
+  for (let bz of [-14, 14]) {
+    for (let x = -16; x <= 16; x += 7) {
+      if (Math.abs(x) < 3) continue;
+      const gap = Math.floor(vr() * 2);
+      if (bz < 0) {
+        candidates.push({ x: x - 2, z: bz - 6 - gap, doorWall: 'z+' });
+        candidates.push({ x: x - 2, z: bz + 3 + gap, doorWall: 'z-' });
+      } else {
+        candidates.push({ x: x - 2, z: bz + 3 + gap, doorWall: 'z-' });
+        candidates.push({ x: x - 2, z: bz - 6 - gap, doorWall: 'z+' });
+      }
     }
   }
-}
-
-var cx = Math.floor(MAP_W / 2), cy = Math.floor(MAP_H / 2);
-for (var ri = -10; ri <= 10; ri++) {
-  if (cy + ri >= 2 && cy + ri < MAP_H - 2) map[cy + ri][cx] = T.DIRT;
-  if (cx + ri >= 2 && cx + ri < MAP_W - 2) map[cy][cx + ri] = T.DIRT;
-}
-for (var ri2 = -4; ri2 <= 4; ri2++) {
-  if (cx + ri2 >= 2 && cx + ri2 < MAP_W - 2) {
-    map[cy - 5][cx + ri2] = T.DIRT;
-    map[cy + 5][cx + ri2] = T.DIRT;
-  }
-}
-for (var pdy = -2; pdy <= 2; pdy++) {
-  for (var pdx = -2; pdx <= 2; pdx++) {
-    map[cy + pdy][cx + pdx] = T.STONE_PATH;
-  }
-}
-
-var BTYPE = { HOUSE: 0, WALL: 1, GATE: 2, TREE_FARM: 3 };
-var buildings = [
-  { type: BTYPE.HOUSE, x: cx - 4, y: cy - 7, w: 2, h: 2, hp: 50, maxHp: 50, built: true },
-  { type: BTYPE.HOUSE, x: cx + 3, y: cy - 7, w: 2, h: 2, hp: 50, maxHp: 50, built: true },
-  { type: BTYPE.HOUSE, x: cx - 6, y: cy - 2, w: 2, h: 2, hp: 50, maxHp: 50, built: true },
-  { type: BTYPE.HOUSE, x: cx + 5, y: cy - 2, w: 2, h: 2, hp: 50, maxHp: 50, built: true },
-  { type: BTYPE.HOUSE, x: cx - 4, y: cy + 6, w: 2, h: 2, hp: 50, maxHp: 50, built: true },
-  { type: BTYPE.HOUSE, x: cx + 3, y: cy + 6, w: 2, h: 2, hp: 50, maxHp: 50, built: true },
-  { type: BTYPE.HOUSE, x: cx + 1, y: cy - 8, w: 2, h: 2, hp: 50, maxHp: 50, built: true },
-  { type: BTYPE.HOUSE, x: cx + 1, y: cy + 6, w: 2, h: 2, hp: 50, maxHp: 50, built: true }
-];
-
-var walkable = [];
-var enemyWalkable = [];
-for (var wy = 0; wy < MAP_H; wy++) {
-  walkable[wy] = [];
-  enemyWalkable[wy] = [];
-}
-
-function seededRand(seed) {
-  var s = seed;
-  return function() {
-    s = (s * 16807 + 11) % 2147483647;
-    return s / 2147483647;
-  };
-}
-var dRng = seededRand(42);
-
-var deposits = [];
-for (var ti = 0; ti < 60; ti++) {
-  var tx = Math.floor(dRng() * (MAP_W - 6)) + 3;
-  var ty = Math.floor(dRng() * (MAP_H - 6)) + 3;
-  var dist = Math.abs(tx - cx) + Math.abs(ty - cy);
-  if (dist < 8) continue;
-  deposits.push({ type: 'wood', x: tx, y: ty, amount: 1 });
-}
-for (var si = 0; si < 20; si++) {
-  var stx = Math.floor(dRng() * (MAP_W - 8)) + 4;
-  var sty = Math.floor(dRng() * (MAP_H - 8)) + 4;
-  var sdist = Math.abs(stx - cx) + Math.abs(sty - cy);
-  if (sdist < 12) continue;
-  deposits.push({ type: 'stone', x: stx, y: sty, amount: 4 });
-}
-for (var ii = 0; ii < 10; ii++) {
-  var ix = Math.floor(dRng() * (MAP_W - 8)) + 4;
-  var iy = Math.floor(dRng() * (MAP_H - 8)) + 4;
-  var idist = Math.abs(ix - cx) + Math.abs(iy - cy);
-  if (idist < 18) continue;
-  deposits.push({ type: 'iron', x: ix, y: iy, amount: 3 });
-}
-
-function rebuildWalkable() {
-  for (var y = 0; y < MAP_H; y++) {
-    for (var x = 0; x < MAP_W; x++) {
-      var base = map[y][x] !== T.WATER && map[y][x] !== T.WALL_BOUNDARY;
-      walkable[y][x] = base;
-      enemyWalkable[y][x] = base;
+  // Along primary branches at x=±14: house left or right
+  for (let bx of [-14, 14]) {
+    for (let z = -16; z <= 16; z += 7) {
+      if (Math.abs(z) < 3) continue;
+      const gap = Math.floor(vr() * 2);
+      if (bx < 0) {
+        candidates.push({ x: bx - 6 - gap, z: z - 2, doorWall: 'x+' });
+        candidates.push({ x: bx + 3 + gap, z: z - 2, doorWall: 'x-' });
+      } else {
+        candidates.push({ x: bx + 3 + gap, z: z - 2, doorWall: 'x-' });
+        candidates.push({ x: bx - 6 - gap, z: z - 2, doorWall: 'x+' });
+      }
     }
   }
-  for (var bi = 0; bi < buildings.length; bi++) {
-    var b = buildings[bi];
-    for (var bdy = 0; bdy < b.h; bdy++) {
-      for (var bdx = 0; bdx < b.w; bdx++) {
-        var bx = b.x + bdx, by = b.y + bdy;
-        if (bx >= 0 && bx < MAP_W && by >= 0 && by < MAP_H) {
-          if (b.type === BTYPE.GATE) {
-            enemyWalkable[by][bx] = false;
-          } else if (b.type === BTYPE.WALL) {
-            walkable[by][bx] = false;
-            enemyWalkable[by][bx] = false;
-          } else {
-            walkable[by][bx] = false;
-            enemyWalkable[by][bx] = false;
+
+  // Shuffle candidates using seed
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(vr() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+  }
+
+  // Always 8 houses
+  const numHouses = 8;
+  for (const c of candidates) {
+    if (houses.length >= numHouses) break;
+    // Check house footprint (5x5) doesn't overlap any road
+    let overlapsRoad = false;
+    for (let dx = 0; dx < 5 && !overlapsRoad; dx++) {
+      for (let dz = 0; dz < 5 && !overlapsRoad; dz++) {
+        if (isRoad(c.x + dx, c.z + dz)) overlapsRoad = true;
+      }
+    }
+    if (overlapsRoad) continue;
+    // Check not inside village square
+    if (c.x + 4 >= -5 && c.x <= 5 && c.z + 4 >= -5 && c.z <= 5) continue;
+    // Check no overlap with existing houses (8 block gap)
+    let tooClose = false;
+    for (const h of houses) {
+      if (Math.abs(c.x - h.x) < 7 && Math.abs(c.z - h.z) < 7) { tooClose = true; break; }
+    }
+    if (tooClose) continue;
+    houses.push(c);
+  }
+  return houses;
+}
+const HOUSES = generateVillage();
+
+const doorData=new Map();
+const doorFronts=new Set();
+for(const h of HOUSES){
+  let dx,dz,fx,fz,stepX=0,stepZ=0;
+  if(h.doorWall==='z-'){dx=h.x+2;dz=h.z;fx=dx;fz=h.z-1;stepZ=-1;}
+  else if(h.doorWall==='z+'){dx=h.x+2;dz=h.z+4;fx=dx;fz=h.z+5;stepZ=1;}
+  else if(h.doorWall==='x-'){dx=h.x;dz=h.z+2;fx=h.x-1;fz=dz;stepX=-1;}
+  else{dx=h.x+4;dz=h.z+2;fx=h.x+5;fz=dz;stepX=1;}
+  doorData.set(`${dx},2,${dz}`,{facing:h.doorWall,open:false});
+  doorData.set(`${dx},3,${dz}`,{facing:h.doorWall,open:false});
+  // Place 3 dirt blocks extending from door toward road
+  for(let i=0;i<3;i++){doorFronts.add(`${fx+stepX*i},${fz+stepZ*i}`);}
+}
+
+function isRoad(wx,wz){
+  const ax=Math.abs(wx),az=Math.abs(wz);
+  // Main roads: N/S/E/W, 3 wide (wx or wz in -1..1), extending from ±6 to ±40
+  if(wx>=-1&&wx<=1&&az>=6&&az<=40)return true;
+  if(wz>=-1&&wz<=1&&ax>=6&&ax<=40)return true;
+  // Primary branches at z=±14: perpendicular, asymmetric lengths
+  if(wz>=-15&&wz<=-13&&wx>=2&&wx<=18)return true; // NE branch (18)
+  if(wz>=-15&&wz<=-13&&wx>=-16&&wx<=-2)return true; // NW branch (16)
+  if(wz>=13&&wz<=15&&wx>=2&&wx<=15)return true; // SE branch (15)
+  if(wz>=13&&wz<=15&&wx>=-18&&wx<=-2)return true; // SW branch (18)
+  // Primary branches at x=±14: perpendicular, asymmetric lengths
+  if(wx>=13&&wx<=15&&wz>=-16&&wz<=-2)return true; // EN branch (16)
+  if(wx>=13&&wx<=15&&wz>=2&&wz<=18)return true; // ES branch (18)
+  if(wx>=-15&&wx<=-13&&wz>=-18&&wz<=-2)return true; // WN branch (18)
+  if(wx>=-15&&wx<=-13&&wz>=2&&wz<=15)return true; // WS branch (15)
+  // Secondary branches at z=±30: perpendicular, asymmetric
+  if(wz>=-31&&wz<=-29&&wx>=2&&wx<=14)return true;
+  if(wz>=-31&&wz<=-29&&wx>=-12&&wx<=-2)return true;
+  if(wz>=29&&wz<=31&&wx>=2&&wx<=12)return true;
+  if(wz>=29&&wz<=31&&wx>=-14&&wx<=-2)return true;
+  // Secondary branches at x=±30: perpendicular, asymmetric
+  if(wx>=29&&wx<=31&&wz>=-12&&wz<=-2)return true;
+  if(wx>=29&&wx<=31&&wz>=2&&wz<=14)return true;
+  if(wx>=-31&&wx<=-29&&wz>=-14&&wz<=-2)return true;
+  if(wx>=-31&&wx<=-29&&wz>=2&&wz<=12)return true;
+  // Connecting roads: vertical segments at x=±12 (3 wide: 11..13) connecting z=-31 to z=-13 and z=13 to z=31
+  if(ax>=11&&ax<=13&&wz>=-31&&wz<=-13)return true;
+  if(ax>=11&&ax<=13&&wz>=13&&wz<=31)return true;
+  // Connecting roads: horizontal segments at z=±12 (3 wide: 11..13) connecting x=-31 to x=-13 and x=13 to x=31
+  if(az>=11&&az<=13&&wx>=-31&&wx<=-13)return true;
+  if(az>=11&&az<=13&&wx>=13&&wx<=31)return true;
+  return false;
+}
+
+function isProtectedArea(wx,wz){
+  const ax=Math.abs(wx),az=Math.abs(wz);
+  // Village core — 5 block buffer around the square
+  if(ax<=10&&az<=10)return true;
+  // Main roads N/S/E/W (5 block buffer)
+  if(ax<=6&&az<=45)return true;
+  if(az<=6&&ax<=45)return true;
+  // Primary branches at ±14 (5 block buffer)
+  if(Math.abs(wz-14)<=6&&ax<=23)return true;
+  if(Math.abs(wz+14)<=6&&ax<=23)return true;
+  if(Math.abs(wx-14)<=6&&az<=23)return true;
+  if(Math.abs(wx+14)<=6&&az<=23)return true;
+  // Secondary branches at ±30
+  if(Math.abs(wz-30)<=6&&ax<=19)return true;
+  if(Math.abs(wz+30)<=6&&ax<=19)return true;
+  if(Math.abs(wx-30)<=6&&az<=19)return true;
+  if(Math.abs(wx+30)<=6&&az<=19)return true;
+  // Connecting vertical segments at x=±12
+  if(ax>=6&&ax<=18&&az>=8&&az<=36)return true;
+  // Connecting horizontal segments at z=±12
+  if(az>=6&&az<=18&&ax>=8&&ax<=36)return true;
+  // Houses (5 block buffer)
+  for(const h of HOUSES)if(wx>=h.x-5&&wx<=h.x+9&&wz>=h.z-5&&wz<=h.z+9)return true;
+  return false;
+}
+
+function getHouseBlock(wx,wy,wz){
+  for(const h of HOUSES){
+    const lx=wx-h.x,lz=wz-h.z;
+    if(lx<0||lx>4||lz<0||lz>4||wy<1||wy>7)continue;
+    if(wy===1)return BLOCK.COBBLE;
+    const isCorner=(lx===0||lx===4)&&(lz===0||lz===4);
+    const isEdge=lx===0||lx===4||lz===0||lz===4;
+    let isDoor=false;
+    if(h.doorWall==='z-'&&lz===0&&lx===2)isDoor=true;
+    if(h.doorWall==='z+'&&lz===4&&lx===2)isDoor=true;
+    if(h.doorWall==='x-'&&lx===0&&lz===2)isDoor=true;
+    if(h.doorWall==='x+'&&lx===4&&lz===2)isDoor=true;
+    if(wy>=2&&wy<=4){
+      if(isEdge){if(isDoor&&wy<=3)return BLOCK.DOOR;if(isCorner)return BLOCK.WOOD;return BLOCK.PLANKS;}
+      if(wy===2){let b1x,b1z,b2x,b2z;
+        if(h.doorWall==='z-'){b1x=3;b1z=3;b2x=3;b2z=2;}else if(h.doorWall==='z+'){b1x=1;b1z=1;b2x=1;b2z=2;}
+        else if(h.doorWall==='x-'){b1x=3;b1z=1;b2x=2;b2z=1;}else{b1x=1;b1z=3;b2x=2;b2z=3;}
+        if((lx===b1x&&lz===b1z)||(lx===b2x&&lz===b2z))return BLOCK.BED;}
+      return BLOCK.AIR;
+    }
+    if(wy===5)return BLOCK.COBBLE;
+    if(wy===6&&lz>=1&&lz<=3)return BLOCK.COBBLE;
+    if(wy===7&&lz===2)return BLOCK.COBBLE;
+  }return null;
+}
+
+// ============================================================
+// CHUNKS
+// ============================================================
+const chunks=new Map();
+function chunkKey(cx,cz){return`${cx},${cz}`;}
+
+function generateChunk(cx,cz){
+  const blocks=new Uint8Array(CHUNK_SIZE*WORLD_HEIGHT*CHUNK_SIZE);
+  const idx=(x,y,z)=>x+z*CHUNK_SIZE+y*CHUNK_SIZE*CHUNK_SIZE;
+  for(let x=0;x<CHUNK_SIZE;x++){for(let z=0;z<CHUNK_SIZE;z++){
+    const wx=cx*CHUNK_SIZE+x,wz=cz*CHUNK_SIZE+z;
+    blocks[idx(x,0,z)]=BLOCK.DIRT;
+    // Check if this position is inside a house footprint
+    let inHouse=false;
+    for(const h of HOUSES){if(wx>=h.x&&wx<=h.x+4&&wz>=h.z&&wz<=h.z+4){inHouse=true;break;}}
+    // Village square
+    if(wx>=-5&&wx<=5&&wz>=-5&&wz<=5){blocks[idx(x,1,z)]=(wx===0&&wz===0)?BLOCK.COBBLE:BLOCK.STONEBRICK;}
+    else if(!inHouse&&(isRoad(wx,wz)||doorFronts.has(`${wx},${wz}`))){blocks[idx(x,1,z)]=BLOCK.DIRT;}
+    else{blocks[idx(x,1,z)]=BLOCK.GRASS;}
+    for(let y=1;y<WORLD_HEIGHT;y++){const hb=getHouseBlock(wx,y,wz);if(hb!==null)blocks[idx(x,y,z)]=hb;}
+  }}
+  // Trees
+  const ts=((cx*73856093)^(cz*19349663)^WORLD_SEED)>>>0;let seed=ts;
+  const tr=()=>{seed=(seed*16807+11)%2147483647;return seed/2147483647;};
+  const nt=Math.floor(tr()*3)+1;
+  for(let t=0;t<nt;t++){
+    const tx=Math.floor(tr()*12)+2,tz=Math.floor(tr()*12)+2;
+    const wx=cx*CHUNK_SIZE+tx,wz=cz*CHUNK_SIZE+tz;
+    if(isProtectedArea(wx,wz))continue;
+    const th=Math.floor(tr()*3)+4;
+    for(let y=2;y<2+th&&y<WORLD_HEIGHT;y++)blocks[idx(tx,y,tz)]=BLOCK.WOOD;
+    const lb=2+th-2;
+    for(let ly=lb;ly<=2+th+1&&ly<WORLD_HEIGHT;ly++){const r=ly<=2+th?2:1;
+      for(let lx=-r;lx<=r;lx++){for(let lz=-r;lz<=r;lz++){
+        if(lx===0&&lz===0&&ly<=2+th)continue;
+        const bx=tx+lx,bz=tz+lz;
+        if(bx>=0&&bx<CHUNK_SIZE&&bz>=0&&bz<CHUNK_SIZE){
+          if(Math.abs(lx)===r&&Math.abs(lz)===r&&tr()>0.6)continue;
+          if(blocks[idx(bx,ly,bz)]===BLOCK.AIR)blocks[idx(bx,ly,bz)]=BLOCK.LEAVES;
+    }}}}
+    // Re-place trunk after leaves to fix tree tops
+    for(let y=2;y<2+th&&y<WORLD_HEIGHT;y++)blocks[idx(tx,y,tz)]=BLOCK.WOOD;
+  }
+  // Rocks: 2x2x2 clusters, reduced frequency
+  if(tr()<0.25){
+    const rx=Math.floor(tr()*12)+2,rz=Math.floor(tr()*12)+2;
+    const rwx=cx*CHUNK_SIZE+rx,rwz=cz*CHUNK_SIZE+rz;
+    if(!isProtectedArea(rwx,rwz)&&!isProtectedArea(rwx+1,rwz)&&!isProtectedArea(rwx,rwz+1)&&!isProtectedArea(rwx+1,rwz+1)){
+      // 2x2 base at y=2
+      for(let dx=0;dx<2;dx++){for(let dz=0;dz<2;dz++){
+        const bx=rx+dx,bz=rz+dz;
+        if(bx>=0&&bx<CHUNK_SIZE&&bz>=0&&bz<CHUNK_SIZE&&blocks[idx(bx,2,bz)]===BLOCK.AIR){
+          blocks[idx(bx,2,bz)]=BLOCK.STONE;
+        }
+      }}
+      // 2x2 on top at y=3, skip random corners for organic look
+      for(let dx=0;dx<2;dx++){for(let dz=0;dz<2;dz++){
+        if(tr()<0.4)continue; // skip this corner
+        const bx=rx+dx,bz=rz+dz;
+        if(bx>=0&&bx<CHUNK_SIZE&&bz>=0&&bz<CHUNK_SIZE&&blocks[idx(bx,3,bz)]===BLOCK.AIR){
+          blocks[idx(bx,3,bz)]=BLOCK.STONE;
+        }
+      }}
+    }
+  }
+  // Ruined wall segments scattered around village area
+  if(tr()<0.35){
+    const rwx=cx*CHUNK_SIZE+Math.floor(tr()*10)+3,rwz=cz*CHUNK_SIZE+Math.floor(tr()*10)+3;
+    const dist=Math.sqrt(rwx*rwx+rwz*rwz);
+    // Only near village (20-45 blocks from center), not on roads/houses
+    if(dist>20&&dist<45&&!isProtectedArea(rwx,rwz)){
+      const wallLen=2+Math.floor(tr()*3); // 2-4 blocks long
+      const wallH=2+Math.floor(tr()*3); // 2-4 blocks tall (half-destroyed)
+      const wallDir=tr()<0.5?0:1; // 0=along x, 1=along z
+      let canPlace=true;
+      for(let wi=0;wi<wallLen&&canPlace;wi++){
+        const wx2=wallDir===0?rwx+wi:rwx,wz2=wallDir===0?rwz:rwz+wi;
+        const lx2=wx2-cx*CHUNK_SIZE,lz2=wz2-cz*CHUNK_SIZE;
+        if(lx2<0||lx2>=CHUNK_SIZE||lz2<0||lz2>=CHUNK_SIZE)canPlace=false;
+        else if(blocks[idx(lx2,2,lz2)]!==BLOCK.AIR)canPlace=false;
+      }
+      if(canPlace){
+        for(let wi=0;wi<wallLen;wi++){
+          const wx2=wallDir===0?rwx+wi:rwx,wz2=wallDir===0?rwz:rwz+wi;
+          const lx2=wx2-cx*CHUNK_SIZE,lz2=wz2-cz*CHUNK_SIZE;
+          // Vary height per column for ruined look
+          const colH=wallH-Math.floor(tr()*2);
+          for(let dy=2;dy<2+colH&&dy<WORLD_HEIGHT;dy++){
+            blocks[idx(lx2,dy,lz2)]=BLOCK.PLANKS;
           }
         }
       }
     }
   }
-  for (var di = 0; di < deposits.length; di++) {
-    var d = deposits[di];
-    if (d.x >= 0 && d.x < MAP_W && d.y >= 0 && d.y < MAP_H) {
-      walkable[d.y][d.x] = false;
-      enemyWalkable[d.y][d.x] = false;
+  return blocks;
+}
+
+function getBlock(wx,wy,wz){if(wy<0||wy>=WORLD_HEIGHT)return BLOCK.AIR;const cx=Math.floor(wx/CHUNK_SIZE),cz=Math.floor(wz/CHUNK_SIZE);const chunk=chunks.get(chunkKey(cx,cz));if(!chunk)return BLOCK.AIR;const lx=((wx%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE,lz=((wz%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE;return chunk.blocks[lx+lz*CHUNK_SIZE+wy*CHUNK_SIZE*CHUNK_SIZE];}
+function setBlock(wx,wy,wz,type){if(wy<0||wy>=WORLD_HEIGHT)return;const cx=Math.floor(wx/CHUNK_SIZE),cz=Math.floor(wz/CHUNK_SIZE);const chunk=chunks.get(chunkKey(cx,cz));if(!chunk)return;const lx=((wx%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE,lz=((wz%CHUNK_SIZE)+CHUNK_SIZE)%CHUNK_SIZE;chunk.blocks[lx+lz*CHUNK_SIZE+wy*CHUNK_SIZE*CHUNK_SIZE]=type;chunk.dirty=true;if(lx===0){const n=chunks.get(chunkKey(cx-1,cz));if(n)n.dirty=true;}if(lx===CHUNK_SIZE-1){const n=chunks.get(chunkKey(cx+1,cz));if(n)n.dirty=true;}if(lz===0){const n=chunks.get(chunkKey(cx,cz-1));if(n)n.dirty=true;}if(lz===CHUNK_SIZE-1){const n=chunks.get(chunkKey(cx,cz+1));if(n)n.dirty=true;}}
+function markDirtyAt(wx,wz){const cx=Math.floor(wx/CHUNK_SIZE),cz=Math.floor(wz/CHUNK_SIZE);const ch=chunks.get(chunkKey(cx,cz));if(ch)ch.dirty=true;}
+
+// ============================================================
+// MESH
+// ============================================================
+const faceData=[{dir:[0,1,0],corners:[[0,1,1],[1,1,1],[1,1,0],[0,1,0]],face:'top'},{dir:[0,-1,0],corners:[[0,0,0],[1,0,0],[1,0,1],[0,0,1]],face:'bottom'},{dir:[0,0,1],corners:[[0,0,1],[1,0,1],[1,1,1],[0,1,1]],face:'side'},{dir:[0,0,-1],corners:[[1,0,0],[0,0,0],[0,1,0],[1,1,0]],face:'side'},{dir:[1,0,0],corners:[[1,0,1],[1,0,0],[1,1,0],[1,1,1]],face:'side'},{dir:[-1,0,0],corners:[[0,0,0],[0,0,1],[0,1,1],[0,1,0]],face:'side'}];
+const nonSolid=new Set([BLOCK.AIR,BLOCK.DOOR,BLOCK.BED,BLOCK.LEAVES]);
+
+function addQuad(p,n,u,c,ind,c0,c1,c2,c3,norm,ti,br){const ndx=p.length/3;const u0=ti[0],v0=ti[1];const uv=[[u0,v0+tileV],[u0+tileU,v0+tileV],[u0+tileU,v0],[u0,v0]];const pts=[c0,c1,c2,c3];for(let i=0;i<4;i++){p.push(pts[i][0],pts[i][1],pts[i][2]);n.push(norm[0],norm[1],norm[2]);u.push(uv[i][0],uv[i][1]);c.push(br,br,br);}ind.push(ndx,ndx+1,ndx+2,ndx,ndx+2,ndx+3);}
+function getDoorBounds(facing,open){const t=0.15;if(!open){if(facing==='z-')return{x1:0,y1:0,z1:0,x2:1,y2:1,z2:t};if(facing==='z+')return{x1:0,y1:0,z1:1-t,x2:1,y2:1,z2:1};if(facing==='x-')return{x1:0,y1:0,z1:0,x2:t,y2:1,z2:1};return{x1:1-t,y1:0,z1:0,x2:1,y2:1,z2:1};}else{if(facing==='z-')return{x1:0,y1:0,z1:0,x2:t,y2:1,z2:1};if(facing==='z+')return{x1:1-t,y1:0,z1:0,x2:1,y2:1,z2:1};if(facing==='x-')return{x1:0,y1:0,z1:0,x2:1,y2:1,z2:t};return{x1:0,y1:0,z1:1-t,x2:1,y2:1,z2:1};}}
+function addThinBox(p,n,u,c,ind,x,y,z,b,bl,br){
+  const ts=textureMap[bl]['side'],tt=textureMap[bl]['top'],tb=textureMap[bl]['bottom'];
+  // Detect thin dimension: +Z/-Z face width = x-extent, +X/-X face width = z-extent
+  const xThin=(b.x2-b.x1)<0.5,zThin=(b.z2-b.z1)<0.5;
+  // +Z/-Z faces are narrow when x is thin; +X/-X faces are narrow when z is thin
+  const zFaceTex=xThin?tt:ts, xFaceTex=zThin?tt:ts;
+  addQuad(p,n,u,c,ind,[x+b.x1,y+b.y2,z+b.z2],[x+b.x2,y+b.y2,z+b.z2],[x+b.x2,y+b.y2,z+b.z1],[x+b.x1,y+b.y2,z+b.z1],[0,1,0],tt,br);
+  addQuad(p,n,u,c,ind,[x+b.x1,y+b.y1,z+b.z1],[x+b.x2,y+b.y1,z+b.z1],[x+b.x2,y+b.y1,z+b.z2],[x+b.x1,y+b.y1,z+b.z2],[0,-1,0],tb,br);
+  addQuad(p,n,u,c,ind,[x+b.x1,y+b.y1,z+b.z2],[x+b.x2,y+b.y1,z+b.z2],[x+b.x2,y+b.y2,z+b.z2],[x+b.x1,y+b.y2,z+b.z2],[0,0,1],zFaceTex,br);
+  addQuad(p,n,u,c,ind,[x+b.x2,y+b.y1,z+b.z1],[x+b.x1,y+b.y1,z+b.z1],[x+b.x1,y+b.y2,z+b.z1],[x+b.x2,y+b.y2,z+b.z1],[0,0,-1],zFaceTex,br);
+  addQuad(p,n,u,c,ind,[x+b.x2,y+b.y1,z+b.z2],[x+b.x2,y+b.y1,z+b.z1],[x+b.x2,y+b.y2,z+b.z1],[x+b.x2,y+b.y2,z+b.z2],[1,0,0],xFaceTex,br);
+  addQuad(p,n,u,c,ind,[x+b.x1,y+b.y1,z+b.z1],[x+b.x1,y+b.y1,z+b.z2],[x+b.x1,y+b.y2,z+b.z2],[x+b.x1,y+b.y2,z+b.z1],[-1,0,0],xFaceTex,br);
+}
+
+function buildChunkMesh(cx,cz){
+  const chunk=chunks.get(chunkKey(cx,cz));if(!chunk)return;
+  const pos=[],nor=[],uvs=[],col=[],ind=[];
+  const idx=(x,y,z)=>x+z*CHUNK_SIZE+y*CHUNK_SIZE*CHUNK_SIZE;
+  for(let y=0;y<WORLD_HEIGHT;y++){for(let z=0;z<CHUNK_SIZE;z++){for(let x=0;x<CHUNK_SIZE;x++){
+    const bl=chunk.blocks[idx(x,y,z)];if(bl===BLOCK.AIR)continue;
+    const wx=cx*CHUNK_SIZE+x,wz=cz*CHUNK_SIZE+z;
+    if(bl===BLOCK.DOOR){const dd=doorData.get(`${wx},${y},${wz}`);addThinBox(pos,nor,uvs,col,ind,x,y,z,getDoorBounds(dd?dd.facing:'z-',dd?dd.open:false),bl,BR);continue;}
+    if(bl===BLOCK.BED){addThinBox(pos,nor,uvs,col,ind,x,y,z,{x1:0,y1:0,z1:0,x2:1,y2:0.5,z2:1},bl,BR);continue;}
+    if(bl===BLOCK.LEAVES){for(let f=0;f<6;f++){const{dir,corners,face}=faceData[f];const nx=wx+dir[0],ny=y+dir[1],nz=wz+dir[2];const nb=getBlock(nx,ny,nz);if(nb!==BLOCK.AIR&&nb!==BLOCK.LEAVES&&nb!==BLOCK.DOOR&&nb!==BLOCK.BED)continue;const ndx=pos.length/3;const ti=textureMap[bl][face];const u0=ti[0],v0=ti[1];const uv=[[u0,v0+tileV],[u0+tileU,v0+tileV],[u0+tileU,v0],[u0,v0]];for(let ci=0;ci<4;ci++){const co=corners[ci];pos.push(x+co[0],y+co[1],z+co[2]);nor.push(dir[0],dir[1],dir[2]);uvs.push(uv[ci][0],uv[ci][1]);col.push(BR,BR,BR);}ind.push(ndx,ndx+1,ndx+2,ndx,ndx+2,ndx+3);}continue;}
+    for(let f=0;f<6;f++){const{dir,corners,face}=faceData[f];const nx=wx+dir[0],ny=y+dir[1],nz=wz+dir[2];const nb=getBlock(nx,ny,nz);if(!nonSolid.has(nb))continue;const ndx=pos.length/3;const ti=textureMap[bl][face];const u0=ti[0],v0=ti[1];const uv=[[u0,v0+tileV],[u0+tileU,v0+tileV],[u0+tileU,v0],[u0,v0]];for(let ci=0;ci<4;ci++){const co=corners[ci];pos.push(x+co[0],y+co[1],z+co[2]);nor.push(dir[0],dir[1],dir[2]);uvs.push(uv[ci][0],uv[ci][1]);col.push(BR,BR,BR);}ind.push(ndx,ndx+1,ndx+2,ndx,ndx+2,ndx+3);}
+  }}}
+  if(chunk.mesh){scene.remove(chunk.mesh);chunk.mesh.geometry.dispose();}
+  if(pos.length>0){const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));geo.setIndex(ind);const mesh=new THREE.Mesh(geo,blockMaterial);mesh.position.set(cx*CHUNK_SIZE,0,cz*CHUNK_SIZE);scene.add(mesh);chunk.mesh=mesh;}
+  chunk.dirty=false;
+}
+
+// ============================================================
+// THREE.JS + RAYCAST
+// ============================================================
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x87CEEB);scene.fog=new THREE.Fog(0x87CEEB,CHUNK_SIZE*(RENDER_DIST-2),CHUNK_SIZE*RENDER_DIST);
+const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
+const renderer=new THREE.WebGLRenderer({antialias:false});renderer.setSize(window.innerWidth,window.innerHeight);renderer.setPixelRatio(window.devicePixelRatio);document.body.appendChild(renderer.domElement);
+
+// ============================================================
+// PARTICLE SYSTEM
+// ============================================================
+const particles = [];
+function spawnParticles(x, y, z, color, count, speed) {
+  for (let i = 0; i < count; i++) {
+    const geo = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+    const mat = new THREE.MeshBasicMaterial({color: color});
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(x, y, z);
+    scene.add(mesh);
+    particles.push({
+      mesh,
+      vx: (Math.random() - 0.5) * speed,
+      vy: Math.random() * speed * 0.8 + speed * 0.3,
+      vz: (Math.random() - 0.5) * speed,
+      life: 0.8 + Math.random() * 0.5,
+    });
+  }
+}
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.life -= dt;
+    p.vy -= 8 * dt; // gravity
+    p.mesh.position.x += p.vx * dt;
+    p.mesh.position.y += p.vy * dt;
+    p.mesh.position.z += p.vz * dt;
+    p.mesh.material.opacity = Math.max(0, p.life);
+    p.mesh.material.transparent = true;
+    if (p.life <= 0) {
+      scene.remove(p.mesh);
+      p.mesh.geometry.dispose();
+      particles.splice(i, 1);
     }
   }
 }
-rebuildWalkable();
 
-var stockpile = { wood: 0, stone: 0, iron: 0 };
-var selectedVillager = null;
-var menuVillager = null;
-var gameTime = 0;
-var buildMode = false;
-var buildType = null;
-var ghostTile = null;
-var zombies = [];
-var skeletons = [];
-var arrows = [];
-var gameOver = false;
+// ============================================================
+// BIRDS
+// ============================================================
+const birds=[];
+let birdSpawnTimer=0;
+function createBirdMesh(){
+  const g=new THREE.Group();
+  // Bigger, more colorful bird
+  const body=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.25,0.5),new THREE.MeshBasicMaterial({color:0xcc4444}));
+  g.add(body);
+  // White belly
+  const belly=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.12,0.4),new THREE.MeshBasicMaterial({color:0xeeddcc}));
+  belly.position.set(0,-0.08,0);g.add(belly);
+  // Head
+  const head=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.22,0.22),new THREE.MeshBasicMaterial({color:0xcc4444}));
+  head.position.set(0,0.2,0.2);g.add(head);
+  // Beak
+  const beak=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.06,0.12),new THREE.MeshBasicMaterial({color:0xffaa33}));
+  beak.position.set(0,0.17,0.33);g.add(beak);
+  // Wings
+  const wingL=new THREE.Mesh(new THREE.BoxGeometry(0.45,0.06,0.3),new THREE.MeshBasicMaterial({color:0x993333}));
+  wingL.position.set(-0.3,0.08,0);g.add(wingL);
+  const wingR=new THREE.Mesh(new THREE.BoxGeometry(0.45,0.06,0.3),new THREE.MeshBasicMaterial({color:0x993333}));
+  wingR.position.set(0.3,0.08,0);g.add(wingR);
+  // Tail
+  const tail=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.06,0.2),new THREE.MeshBasicMaterial({color:0x772222}));
+  tail.position.set(0,0.05,-0.3);g.add(tail);
+  g.userData={wingL,wingR};
+  return g;
+}
+function findNearbyTree(x,z,range){
+  for(let dx=-range;dx<=range;dx+=3){for(let dz=-range;dz<=range;dz+=3){
+    const wx=Math.floor(x)+dx,wz=Math.floor(z)+dz;
+    if(getBlock(wx,2,wz)===BLOCK.WOOD){
+      let ty=2;while(ty<12&&getBlock(wx,ty+1,wz)===BLOCK.WOOD)ty++;
+      // Must have leaves above (real tree, not house post)
+      let hasLeaves=false;
+      for(let ly=ty;ly<ty+4;ly++){for(let lx=-2;lx<=2;lx++){for(let lz=-2;lz<=2;lz++){
+        if(getBlock(wx+lx,ly,wz+lz)===BLOCK.LEAVES)hasLeaves=true;
+      }}}
+      if(hasLeaves)return{x:wx+0.5,y:ty+2,z:wz+0.5};
+    }
+  }}
+  return null;
+}
+function updateBirds(dt){
+  const isNight=worldTime>=DAY_LENGTH;
+  if(!isNight){
+    birdSpawnTimer+=dt;
+    if(birdSpawnTimer>8&&birds.length<6){
+      birdSpawnTimer=0;
+      const ang=Math.random()*Math.PI*2,dist=15+Math.random()*25;
+      const bx=player.pos.x+Math.cos(ang)*dist,bz=player.pos.z+Math.sin(ang)*dist;
+      const tree=findNearbyTree(bx,bz,8);
+      if(tree){
+        const bird={x:tree.x,y:tree.y,z:tree.z,state:'perch',mesh:null,timer:3+Math.random()*5,
+          targetX:0,targetY:0,targetZ:0,flapPhase:Math.random()*Math.PI*2,chirpTimer:2+Math.random()*4};
+        bird.mesh=createBirdMesh();bird.mesh.position.set(bird.x,bird.y,bird.z);
+        scene.add(bird.mesh);birds.push(bird);
+      }
+    }
+  }
+  for(let i=birds.length-1;i>=0;i--){
+    const b=birds[i];
+    b.flapPhase+=dt*12;b.timer-=dt;
+    if(b.state==='perch'){
+      // Check if tree still exists under us
+      const btx=Math.floor(b.x),btz=Math.floor(b.z);
+      let treeGone=true;
+      for(let cy=2;cy<10;cy++){if(getBlock(btx,cy,btz)===BLOCK.WOOD||getBlock(btx,cy,btz)===BLOCK.LEAVES){treeGone=false;break;}}
+      if(treeGone){
+        // Leaf particles and fly away
+        spawnParticles(b.x,b.y,b.z,0x3a8a20,5,2);
+        const newTree=findNearbyTree(b.x,b.z,30);
+        if(newTree){b.targetX=newTree.x;b.targetY=newTree.y+1;b.targetZ=newTree.z;b.state='fly';b.timer=0;}
+        else{scene.remove(b.mesh);birds.splice(i,1);continue;}
+      }
+      // Chirp occasionally
+      b.chirpTimer-=dt;
+      if(b.chirpTimer<=0){
+        b.chirpTimer=3+Math.random()*6;
+        const dToP=Math.sqrt((b.x-player.pos.x)**2+(b.z-player.pos.z)**2);
+        if(dToP<25){
+          const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+          osc.type='sine';osc.frequency.value=2000+Math.random()*1000;
+          gain.gain.value=Math.max(0.005,0.02*(1-dToP/25));
+          osc.connect(gain);gain.connect(audioCtx.destination);
+          gain.gain.setValueAtTime(gain.gain.value,audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.1);
+          osc.start();osc.stop(audioCtx.currentTime+0.1);
+        }
+      }
+      if(b.timer<=0){
+        const tree=findNearbyTree(b.x,b.z,20);
+        if(tree&&(Math.abs(tree.x-b.x)>3||Math.abs(tree.z-b.z)>3)){
+          b.targetX=tree.x;b.targetY=tree.y+1;b.targetZ=tree.z;b.state='fly';b.timer=0;spawnParticles(b.x,b.y,b.z,0x3a8a20,3,1.5);
+        } else {b.timer=2+Math.random()*4;}
+      }
+      if(b.mesh.userData.wingL){b.mesh.userData.wingL.rotation.z=0;b.mesh.userData.wingR.rotation.z=0;}
+    } else if(b.state==='fly'){
+      const dx=b.targetX-b.x,dy=b.targetY-b.y,dz=b.targetZ-b.z;
+      const dist=Math.sqrt(dx*dx+dy*dy+dz*dz);
+      if(dist<1){b.state='perch';b.timer=3+Math.random()*5;b.y=b.targetY-1;spawnParticles(b.x,b.y,b.z,0x3a8a20,3,1);}
+      else{
+        const spd=8,arcY=Math.sin(b.timer*0.5)*3;
+        b.x+=dx/dist*spd*dt;b.y+=(dy/dist*spd+arcY)*dt;b.z+=dz/dist*spd*dt;
+        b.mesh.rotation.y=Math.atan2(dx,dz);
+        const flap=Math.sin(b.flapPhase)*0.5;
+        if(b.mesh.userData.wingL){b.mesh.userData.wingL.rotation.z=flap;b.mesh.userData.wingR.rotation.z=-flap;}
+      }
+      b.timer+=dt;
+    }
+    if(isNight||Math.sqrt((b.x-player.pos.x)**2+(b.z-player.pos.z)**2)>60){
+      scene.remove(b.mesh);birds.splice(i,1);continue;
+    }
+    b.mesh.position.set(b.x,b.y,b.z);
+  }
+}
 
-var player = {
-  x: cx * TILE + TILE / 2, y: cy * TILE + TILE / 2,
-  speed: 120, size: 12,
-  hp: 5, maxHp: 5,
-  walkTimer: 0, moving: false,
-  regenTimer: 0, dead: false, respawnTimer: 0
-};
+// ============================================================
+// HEALTH BAR SYSTEM
+// ============================================================
+function createHealthBar() {
+  const bg = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.12), new THREE.MeshBasicMaterial({color: 0x333333, side: THREE.DoubleSide}));
+  const fg = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.1), new THREE.MeshBasicMaterial({color: 0xff0000, side: THREE.DoubleSide}));
+  fg.position.z = 0.01;
+  const group = new THREE.Group();
+  group.add(bg); group.add(fg);
+  group.userData.fg = fg;
+  return group;
+}
 
-var villagers = [];
-for (var vi = 0; vi < 8; vi++) {
+// ============================================================
+// SPEECH BUBBLE SYSTEM
+// ============================================================
+function showSpeechBubble(v, text) {
+  if (v.speechMesh) { scene.remove(v.speechMesh); }
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 48;
+  const ctx = canvas.getContext('2d');
+  // Rounded bubble background
+  ctx.fillStyle = 'rgba(0,0,0,0.8)';
+  ctx.beginPath();ctx.roundRect(4,4,120,36,8);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.roundRect(4,4,120,36,8);ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 20px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 64, 24);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.magFilter = THREE.LinearFilter;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(1.8, 0.7, 1);
+  sprite.position.set(v.x, 4.2, v.z);
+  sprite.renderOrder = 999;
+  scene.add(sprite);
+  v.speechMesh = sprite;
+  v.speechTimer = 2.5;
+}
+
+// Day/night cycle: 3 min day + 3 min night = 360s total
+const DAY_LENGTH=180,NIGHT_LENGTH=180,CYCLE_LENGTH=DAY_LENGTH+NIGHT_LENGTH;
+let worldTime=0; // starts at dawn (0 = sunrise)
+
+// Blocky sun
+const sunGeo=new THREE.BoxGeometry(8,8,8);
+const sunMat=new THREE.MeshBasicMaterial({color:0xffdd33,fog:false});
+const sun=new THREE.Mesh(sunGeo,sunMat);
+scene.add(sun);
+const glowGeo=new THREE.BoxGeometry(11,11,11);
+const glowMat=new THREE.MeshBasicMaterial({color:0xffee88,transparent:true,opacity:0.4,fog:false});
+const sunGlow=new THREE.Mesh(glowGeo,glowMat);
+scene.add(sunGlow);
+
+// Blocky moon
+const moonGeo=new THREE.BoxGeometry(6,6,6);
+const moonMat=new THREE.MeshBasicMaterial({color:0xddddee,fog:false});
+const moon=new THREE.Mesh(moonGeo,moonMat);
+scene.add(moon);
+const moonGlowGeo=new THREE.BoxGeometry(9,9,9);
+const moonGlowMat=new THREE.MeshBasicMaterial({color:0xaaaacc,transparent:true,opacity:0.3,fog:false});
+const moonGlow=new THREE.Mesh(moonGlowGeo,moonGlowMat);
+scene.add(moonGlow);
+
+// Stars - small white cubes scattered in a dome
+const stars = [];
+for (let i = 0; i < 80; i++) {
+  const starGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+  const starMat = new THREE.MeshBasicMaterial({color: 0xffffff, fog: false, transparent: true, opacity: 0});
+  const star = new THREE.Mesh(starGeo, starMat);
+  const ang1 = Math.random() * Math.PI * 2;
+  const ang2 = Math.random() * 0.8 + 0.2; // above horizon
+  star.userData.offset = new THREE.Vector3(
+    Math.cos(ang1) * Math.sin(ang2) * 90,
+    Math.cos(ang2) * 90,
+    Math.sin(ang1) * Math.sin(ang2) * 90
+  );
+  star.userData.twinkle = Math.random() * Math.PI * 2;
+  scene.add(star);
+  stars.push(star);
+}
+
+const daySkyColor=new THREE.Color(0x87CEEB);
+const nightSkyColor=new THREE.Color(0x0a0a2a);
+const skyColor=new THREE.Color();
+
+function updateDayNight(dt){
+  // Freeze time at night while zombies exist
+  if (!(worldTime >= DAY_LENGTH && zombies.length > 0)) {
+    worldTime=(worldTime+dt)%CYCLE_LENGTH;
+  }
+  const isDay=worldTime<DAY_LENGTH;
+  const px=player.pos.x,pz=player.pos.z;
+  const skyDist=70;
+
+  const py=player.pos.y;
+  if(isDay){
+    // Sun arcs east to west during day
+    const t=worldTime/DAY_LENGTH; // 0 to 1
+    const ang=t*Math.PI; // 0 to π
+    // East = +x, West = -x; Y relative to player so jumping doesn't affect it
+    sun.position.set(px+Math.cos(ang)*skyDist, py+Math.sin(ang)*skyDist+10, pz);
+    sunGlow.position.copy(sun.position);
+    sun.visible=true;sunGlow.visible=true;
+    moon.visible=false;moonGlow.visible=false;
+  } else {
+    // Moon arcs east to west during night
+    const t=(worldTime-DAY_LENGTH)/NIGHT_LENGTH; // 0 to 1
+    const ang=t*Math.PI;
+    moon.position.set(px+Math.cos(ang)*skyDist, py+Math.sin(ang)*skyDist+10, pz);
+    moonGlow.position.copy(moon.position);
+    moon.visible=true;moonGlow.visible=true;
+    sun.visible=false;sunGlow.visible=false;
+  }
+
+  // Brightness: 1.0 during day, 0.25 at night, with transitions
+  let brightness=1.0;
+  if(isDay){
+    const t=worldTime/DAY_LENGTH;
+    if(t<0.1)brightness=0.25+t/0.1*0.75; // dawn
+    else if(t>0.9)brightness=1.0-(t-0.9)/0.1*0.75; // dusk
+    else brightness=1.0;
+  } else {
+    const t=(worldTime-DAY_LENGTH)/NIGHT_LENGTH;
+    if(t<0.1)brightness=0.25; // just after sunset
+    else if(t>0.9)brightness=0.25; // just before sunrise
+    else brightness=0.25;
+  }
+
+  // Apply brightness to material
+  blockMaterial.color.setRGB(brightness,brightness,brightness);
+
+  // Darken villager and zombie meshes with world
+  for(const v of villagers){if(v.mesh)v.mesh.children.forEach(c=>{if(c.material){
+    if(c.material.map){c.material.color.setScalar(brightness);} // textured faces: just set gray
+    else{if(!c.userData.origColor)c.userData.origColor=c.material.color.clone();c.material.color.copy(c.userData.origColor).multiplyScalar(brightness);}
+  }});}
+  for(const z of zombies){if(z.mesh)z.mesh.children.forEach(c=>{if(c.material){
+    if(c.material.map){c.material.color.setScalar(brightness);}
+    else{if(!c.userData.origColor)c.userData.origColor=c.material.color.clone();c.material.color.copy(c.userData.origColor).multiplyScalar(brightness);}
+  }});}
+
+  // Stars
+  const starOpacity = isDay ? 0 : Math.min(1, (1 - brightness) * 1.5);
+  for (const s of stars) {
+    s.position.set(px + s.userData.offset.x, py + s.userData.offset.y, pz + s.userData.offset.z);
+    s.userData.twinkle += dt * (1 + Math.random());
+    s.material.opacity = starOpacity * (0.5 + 0.5 * Math.sin(s.userData.twinkle));
+    s.visible = starOpacity > 0.01;
+  }
+
+  // Sky color interpolation with sunset/sunrise orange/pink
+  const skyT=Math.max(0,Math.min(1,(brightness-0.25)/0.75));
+  const sunsetColor=new THREE.Color(0xff7733);
+  const sunriseColor=new THREE.Color(0xffaa55);
+  let sunsetAmount=0;
+  if(isDay){
+    const t=worldTime/DAY_LENGTH;
+    if(t<0.15)sunsetAmount=1.0-t/0.15; // sunrise fade out
+    else if(t>0.85)sunsetAmount=(t-0.85)/0.15; // sunset fade in
+  } else {
+    const t=(worldTime-DAY_LENGTH)/NIGHT_LENGTH;
+    if(t<0.05)sunsetAmount=1.0-t/0.05; // post-sunset fade
+    else if(t>0.95)sunsetAmount=(t-0.95)/0.05; // pre-sunrise fade
+  }
+  skyColor.lerpColors(nightSkyColor,daySkyColor,skyT);
+  if(sunsetAmount>0){
+    const warmColor=isDay&&worldTime/DAY_LENGTH<0.5?sunriseColor:sunsetColor;
+    skyColor.lerp(warmColor,sunsetAmount*0.6);
+  }
+  scene.background.copy(skyColor);
+  scene.fog.color.copy(skyColor);
+
+  // Night warning - 15 seconds before night
+  if (isDay && worldTime > DAY_LENGTH - 15 && worldTime < DAY_LENGTH - 14) {
+    document.getElementById('night-msg').textContent = 'Night ' + (nightCount + 1) + ' approaching...';
+    document.getElementById('night-msg').style.display = 'block';
+    nightMsgTimer = 3;
+  }
+
+  // Zombie spawning at night
+  if (!isDay && !zombieSpawnedThisNight) {
+    zombieSpawnedThisNight = true;
+    spawnZombies();
+  }
+  if (isDay && zombieSpawnedThisNight && zombies.length === 0) {
+    zombieSpawnedThisNight = false;
+  }
+
+  // Update night counter display
+  document.getElementById('night-counter').textContent = 'Night: ' + nightCount;
+}
+
+// ============================================================
+// VILLAGERS
+// ============================================================
+const villagers = [];
+const choppingTrees = new Set();
+let menuVillager = null;
+let buildMode = false;
+let placingBuild = null;
+let buildRotation = 0; // 0=N/S, 1=E/W
+const buildSites = [];
+let gameOver = false;
+let nightMsgTimer = 0;
+let screenShake = 0;
+// Placement preview ghost
+const placeGhostGeo = new THREE.BoxGeometry(1, 1, 1);
+const placeGhostMat = new THREE.MeshBasicMaterial({color:0x44aa44, transparent:true, opacity:0.35, depthWrite:false});
+const placeGhost = new THREE.Mesh(placeGhostGeo, placeGhostMat);
+placeGhost.visible = false;
+scene.add(placeGhost);
+
+for (let i = 0; i < HOUSES.length; i++) {
+  const h = HOUSES[i];
+  // Spawn outside the door, not inside the house
+  let sx = h.x + 2.5, sz = h.z + 2.5;
+  if(h.doorWall==='z-'){sx=h.x+2.5;sz=h.z-1.5;}
+  else if(h.doorWall==='z+'){sx=h.x+2.5;sz=h.z+5.5;}
+  else if(h.doorWall==='x-'){sx=h.x-1.5;sz=h.z+2.5;}
+  else{sx=h.x+5.5;sz=h.z+2.5;}
   villagers.push({
-    id: vi,
-    x: (cx + ((dRng() * 8 - 4) | 0)) * TILE + TILE / 2,
-    y: (cy + ((dRng() * 8 - 4) | 0)) * TILE + TILE / 2,
-    speed: 40, state: 'IDLE',
-    wanderTimer: dRng() * 3, wanderDx: 0, wanderDy: 0,
+    x: sx, z: sz, y: 2,
+    vx: 0, vz: 0,
+    state: 'idle',
+    home: h,
+    wanderTimer: Math.random() * 5,
+    wanderDirX: 0, wanderDirZ: 0,
+    mesh: null,
+    headBob: Math.random() * Math.PI * 2,
+    chopTarget: null,
+    chopTimer: 0,
+    buildTarget: null,
     hp: 5, maxHp: 5,
-    walkTimer: 0, moving: false,
-    task: null, statusTimer: 0, statusText: '',
-    targetX: 0, targetY: 0,
-    gatherTimer: 0, gatherTarget: null,
-    buildTimer: 0, buildTarget: null,
-    assignedHouse: null, sleeping: false,
-    canMineStone: false, isWarrior: false,
-    fightTimer: 0, fightTarget: null,
-    stuckTimer: 0, lastDistToTarget: 9999
+    damageFlash: 0,
+    showHealthTimer: 0,
+    healthBar: null,
+    speechMesh: null,
+    speechTimer: 0,
   });
 }
 
-var clock = { phase: 'day', timeLeft: DAY_LENGTH, dayNumber: 1 };
+function createVillagerMesh() {
+  const group = new THREE.Group();
+  // Body (brown tunic)
+  const bodyGeo = new THREE.BoxGeometry(0.5, 0.75, 0.3);
+  const bodyMat = new THREE.MeshBasicMaterial({ color: 0x8B6914 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = 0.75;
+  group.add(body);
+  // Head (skin colored)
+  const headGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+  const headMat = new THREE.MeshBasicMaterial({ color: 0xC49464 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 1.35;
+  group.add(head);
+  // Face texture on front of head
+  const faceCanvas = document.createElement('canvas');
+  faceCanvas.width = 8; faceCanvas.height = 8;
+  const fctx = faceCanvas.getContext('2d');
+  // Skin base
+  fctx.fillStyle = '#C49464';
+  fctx.fillRect(0, 0, 8, 8);
+  // Eyes (dark)
+  fctx.fillStyle = '#fff';
+  fctx.fillRect(1, 2, 2, 2); fctx.fillRect(5, 2, 2, 2);
+  fctx.fillStyle = '#3a2010';
+  fctx.fillRect(2, 2, 1, 2); fctx.fillRect(5, 2, 1, 2);
+  // Nose
+  fctx.fillStyle = '#b8865a';
+  fctx.fillRect(3, 4, 2, 2);
+  // Mouth
+  fctx.fillStyle = '#6b4030';
+  fctx.fillRect(2, 7, 4, 1);
 
-var keys = {};
-document.addEventListener('keydown', function(e) {
-  keys[e.code] = true;
-  if (e.code === 'Escape') {
-    closeVillagerMenu();
-    closeBuildingMenu();
-  }
-  if (e.code === 'KeyE') {
-    buildMode = !buildMode;
-    buildType = null;
-    ghostTile = null;
-    document.getElementById('build-panel').style.display = buildMode ? 'block' : 'none';
-    updateBuildButtons();
-  }
-});
-document.addEventListener('keyup', function(e) { keys[e.code] = false; });
+  const faceTexture = new THREE.CanvasTexture(faceCanvas);
+  faceTexture.magFilter = THREE.NearestFilter;
+  faceTexture.minFilter = THREE.NearestFilter;
+  const faceMat = new THREE.MeshBasicMaterial({ map: faceTexture });
+  const faceGeo = new THREE.PlaneGeometry(0.4, 0.4);
+  const faceMesh = new THREE.Mesh(faceGeo, faceMat);
+  faceMesh.position.set(0, 1.35, 0.205);
+  group.add(faceMesh);
+  // Legs (dark brown) — pivoted at top for walking animation
+  const legMat = new THREE.MeshBasicMaterial({ color: 0x4A3520 });
+  const legGeoL = new THREE.BoxGeometry(0.2, 0.5, 0.25);
+  legGeoL.translate(0, -0.25, 0);
+  const legL = new THREE.Mesh(legGeoL, legMat);
+  legL.position.set(-0.13, 0.5, 0);
+  group.add(legL);
+  const legGeoR = new THREE.BoxGeometry(0.2, 0.5, 0.25);
+  legGeoR.translate(0, -0.25, 0);
+  const legR = new THREE.Mesh(legGeoR, legMat);
+  legR.position.set(0.13, 0.5, 0);
+  group.add(legR);
+  // Arms (skin) — pivoted at shoulder
+  const armMat = new THREE.MeshBasicMaterial({ color: 0xC49464 });
+  const armGeoL = new THREE.BoxGeometry(0.2, 0.6, 0.25);
+  armGeoL.translate(0, -0.3, 0);
+  const armL = new THREE.Mesh(armGeoL, armMat);
+  armL.position.set(-0.35, 1.1, 0);
+  group.add(armL);
+  const armGeoR = new THREE.BoxGeometry(0.2, 0.6, 0.25);
+  armGeoR.translate(0, -0.3, 0);
+  const armR = new THREE.Mesh(armGeoR, armMat);
+  armR.position.set(0.35, 1.1, 0);
+  group.add(armR);
+  // Store references for animation
+  group.userData = { legL, legR, armL, armR };
+  return group;
+}
 
-var buildOptions = [
-  { type: BTYPE.WALL, label: 'Wall', cost: 5, hp: 10 },
-  { type: BTYPE.GATE, label: 'Gate', cost: 5, hp: 10 },
-  { type: BTYPE.TREE_FARM, label: 'Tree Farm', cost: 10, hp: 5 }
-];
+// Create meshes for all villagers
+for (const v of villagers) {
+  v.mesh = createVillagerMesh();
+  v.mesh.position.set(v.x, v.y, v.z);
+  scene.add(v.mesh);
+}
 
-function drawBuildPreview(cvs, type) {
-  var pc = cvs.getContext('2d');
-  pc.clearRect(0, 0, 40, 40);
-  if (type === BTYPE.WALL) {
-    pc.fillStyle = '#6a4a2a';
-    for (var i = 0; i < 5; i++) {
-      pc.fillRect(4 + i * 7, 8, 5, 28);
-      pc.fillRect(5 + i * 7, 4, 3, 6);
-      pc.fillRect(6 + i * 7, 2, 1, 4);
-    }
-    pc.fillStyle = '#5a3a1a';
-    pc.fillRect(2, 20, 36, 3);
-    pc.fillRect(2, 30, 36, 3);
-  } else if (type === BTYPE.GATE) {
-    pc.fillStyle = '#6a4a2a';
-    pc.fillRect(4, 6, 6, 30);
-    pc.fillRect(30, 6, 6, 30);
-    pc.fillRect(5, 2, 4, 6);
-    pc.fillRect(31, 2, 4, 6);
-    pc.fillStyle = '#5a3a1a';
-    pc.fillRect(10, 6, 20, 3);
-    pc.fillStyle = '#8a7a6a';
-    for (var j = 0; j < 3; j++) {
-      pc.fillRect(14 + j * 5, 9, 1, 20);
-    }
-  } else if (type === BTYPE.TREE_FARM) {
-    pc.fillStyle = '#5a3a1a';
-    pc.fillRect(18, 22, 4, 14);
-    pc.fillStyle = '#2a6a15';
-    pc.fillRect(10, 8, 20, 16);
-    pc.fillStyle = '#1a5a0a';
-    pc.fillRect(12, 10, 16, 12);
-    pc.fillStyle = '#7a5a3a';
-    pc.fillRect(0, 34, 40, 3);
-    pc.fillRect(0, 24, 2, 13);
-    pc.fillRect(38, 24, 2, 13);
+// ============================================================
+// ZOMBIES
+// ============================================================
+const zombies = [];
+let zombieSpawnedThisNight = false;
+let nightCount = 0;
+
+function spawnZombies() {
+  nightCount++;
+  const numZ = 1 + nightCount; // Night 1 = 2, Night 2 = 3, etc.
+  // Spawn in a line from a random direction
+  const lineAng = Math.random() * Math.PI * 2;
+  const baseDist = 40 + Math.random() * 15;
+  const baseX = player.pos.x + Math.cos(lineAng) * baseDist;
+  const baseZ = player.pos.z + Math.sin(lineAng) * baseDist;
+  // Perpendicular direction for line spread
+  const perpX = -Math.sin(lineAng);
+  const perpZ = Math.cos(lineAng);
+
+  for (let i = 0; i < numZ; i++) {
+    const offset = (i - (numZ - 1) / 2) * 2.5; // spread along line
+    const zx = baseX + perpX * offset;
+    const zz = baseZ + perpZ * offset;
+    const zombie = {
+      x: zx, z: zz, y: 2,
+      hp: 5, maxHp: 5,
+      speed: 5.2 * 0.75, // 25% slower than walking speed
+      attackTimer: 0,
+      mesh: null,
+      headBob: Math.random() * Math.PI * 2,
+      showHealthTimer: 0,
+      healthBar: null,
+    };
+    zombie.mesh = createZombieMesh();
+    zombie.mesh.position.set(zx, 2, zz);
+    scene.add(zombie.mesh);
+    zombies.push(zombie);
   }
 }
 
-function updateBuildButtons() {
-  var container = document.getElementById('build-buttons');
-  container.innerHTML = '';
-  for (var oi = 0; oi < buildOptions.length; oi++) {
-    (function(opt) {
-      var btn = document.createElement('div');
-      btn.className = 'build-btn' + (buildType === opt.type ? ' selected' : '');
-      var cvs = document.createElement('canvas');
-      cvs.width = 40; cvs.height = 40;
-      drawBuildPreview(cvs, opt.type);
-      btn.appendChild(cvs);
-      var lbl = document.createElement('div');
-      lbl.className = 'label';
-      lbl.textContent = opt.label;
-      btn.appendChild(lbl);
-      var cst = document.createElement('div');
-      cst.className = 'cost';
-      cst.textContent = opt.cost + ' wood';
-      btn.appendChild(cst);
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        buildType = opt.type;
-        updateBuildButtons();
-      });
-      container.appendChild(btn);
-    })(buildOptions[oi]);
-  }
+function createZombieMesh() {
+  const group = new THREE.Group();
+  // Body (green/dark)
+  const bodyGeo = new THREE.BoxGeometry(0.5, 0.75, 0.3);
+  const bodyMat = new THREE.MeshBasicMaterial({ color: 0x2a6622 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.position.y = 0.75;
+  group.add(body);
+  // Head (green)
+  const headGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+  const headMat = new THREE.MeshBasicMaterial({ color: 0x3a8833 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 1.35;
+  group.add(head);
+  // Zombie face
+  const faceCanvas = document.createElement('canvas');
+  faceCanvas.width = 8; faceCanvas.height = 8;
+  const fctx = faceCanvas.getContext('2d');
+  fctx.fillStyle = '#3a8833';
+  fctx.fillRect(0, 0, 8, 8);
+  // Dark eyes
+  fctx.fillStyle = '#000';
+  fctx.fillRect(1, 2, 2, 2); fctx.fillRect(5, 2, 2, 2);
+  // Mouth
+  fctx.fillStyle = '#1a3311';
+  fctx.fillRect(2, 6, 4, 2);
+  const faceTexture = new THREE.CanvasTexture(faceCanvas);
+  faceTexture.magFilter = THREE.NearestFilter;
+  faceTexture.minFilter = THREE.NearestFilter;
+  const faceMat = new THREE.MeshBasicMaterial({ map: faceTexture });
+  const faceGeo = new THREE.PlaneGeometry(0.4, 0.4);
+  const faceMesh = new THREE.Mesh(faceGeo, faceMat);
+  faceMesh.position.set(0, 1.35, 0.205);
+  group.add(faceMesh);
+  // Legs
+  const legMat = new THREE.MeshBasicMaterial({ color: 0x1a4418 });
+  const legGeoL = new THREE.BoxGeometry(0.2, 0.5, 0.25);
+  legGeoL.translate(0, -0.25, 0);
+  const legL = new THREE.Mesh(legGeoL, legMat);
+  legL.position.set(-0.13, 0.5, 0);
+  group.add(legL);
+  const legGeoR = new THREE.BoxGeometry(0.2, 0.5, 0.25);
+  legGeoR.translate(0, -0.25, 0);
+  const legR = new THREE.Mesh(legGeoR, legMat);
+  legR.position.set(0.13, 0.5, 0);
+  group.add(legR);
+  // Arms (extended forward like zombie)
+  const armMat = new THREE.MeshBasicMaterial({ color: 0x3a8833 });
+  const armGeoL = new THREE.BoxGeometry(0.2, 0.6, 0.25);
+  armGeoL.translate(0, -0.3, 0);
+  const armL = new THREE.Mesh(armGeoL, armMat);
+  armL.position.set(-0.35, 1.1, 0);
+  armL.rotation.x = -Math.PI/3; // arms forward
+  group.add(armL);
+  const armGeoR = new THREE.BoxGeometry(0.2, 0.6, 0.25);
+  armGeoR.translate(0, -0.3, 0);
+  const armR = new THREE.Mesh(armGeoR, armMat);
+  armR.position.set(0.35, 1.1, 0);
+  armR.rotation.x = -Math.PI/3;
+  group.add(armR);
+  group.userData = { legL, legR, armL, armR };
+  return group;
 }
 
-var mouseWorldX = 0, mouseWorldY = 0;
-var camera = { x: 0, y: 0 };
+function updateZombies(dt) {
+  for (let i = zombies.length - 1; i >= 0; i--) {
+    const z = zombies[i];
+    if (z.hp <= 0) {
+      spawnParticles(z.x, 3, z.z, 0x3a8833, 10, 2); // green puffs
+      if (z.healthBar) { scene.remove(z.healthBar); z.healthBar = null; }
+      scene.remove(z.mesh);
+      zombies.splice(i, 1);
+      continue;
+    }
+    z.headBob += dt * 3;
+    z.attackTimer = Math.max(0, z.attackTimer - dt);
 
-canvas.addEventListener('mousemove', function(e) {
-  var rect = canvas.getBoundingClientRect();
-  mouseWorldX = (e.clientX - rect.left) / ZOOM + camera.x;
-  mouseWorldY = (e.clientY - rect.top) / ZOOM + camera.y;
-  if (buildMode && buildType !== null) {
-    ghostTile = { x: Math.floor(mouseWorldX / TILE), y: Math.floor(mouseWorldY / TILE) };
-  } else {
-    ghostTile = null;
-  }
-});
+    // Find nearest target (player or villager)
+    let targetX = player.pos.x, targetZ = player.pos.z, targetDist = Infinity;
+    if (!player.dead) {
+      targetDist = Math.sqrt((z.x - player.pos.x) ** 2 + (z.z - player.pos.z) ** 2);
+    }
+    for (const v of villagers) {
+      if (v.hp <= 0) continue;
+      const d = Math.sqrt((z.x - v.x) ** 2 + (z.z - v.z) ** 2);
+      if (d < targetDist) { targetDist = d; targetX = v.x; targetZ = v.z; }
+    }
 
-canvas.addEventListener('contextmenu', function(e) {
-  e.preventDefault();
-  var wx = mouseWorldX, wy = mouseWorldY;
-  if (buildMode) {
-    var btx = Math.floor(wx / TILE);
-    var bty = Math.floor(wy / TILE);
-    for (var i = buildings.length - 1; i >= 0; i--) {
-      var b = buildings[i];
-      if (b.type === BTYPE.WALL || b.type === BTYPE.GATE || b.type === BTYPE.TREE_FARM) {
-        if (btx >= b.x && btx < b.x + b.w && bty >= b.y && bty < b.y + b.h) {
-          var bdist = Math.sqrt((b.x * TILE + TILE / 2 - player.x) * (b.x * TILE + TILE / 2 - player.x) + (b.y * TILE + TILE / 2 - player.y) * (b.y * TILE + TILE / 2 - player.y));
-          if (bdist > INTERACT_RADIUS) return;
-          buildings.splice(i, 1);
-          stockpile.wood += 2;
-          rebuildWalkable();
-          return;
+    // Move toward target
+    if (targetDist > 1.2) {
+      const dx = targetX - z.x, dz = targetZ - z.z;
+      const d = Math.sqrt(dx * dx + dz * dz);
+      const nx = z.x + (dx / d) * z.speed * dt;
+      const nz = z.z + (dz / d) * z.speed * dt;
+      // Simple collision
+      const tx = Math.floor(nx), tz = Math.floor(nz);
+      const b2 = getBlock(tx, 2, tz), b3 = getBlock(tx, 3, tz);
+      const blocked = (b2 !== BLOCK.AIR && b2 !== BLOCK.LEAVES && b2 !== BLOCK.BED) || (b3 !== BLOCK.AIR && b3 !== BLOCK.LEAVES && b3 !== BLOCK.BED);
+      if (!blocked) { z.x = nx; z.z = nz; }
+      else {
+        // Zombie attacks walls/planks it bumps into
+        if (!z.wallAttackTimer) z.wallAttackTimer = 0;
+        z.wallAttackTimer += dt;
+        if (z.wallAttackTimer >= 2.0) { // every 2 seconds
+          z.wallAttackTimer = 0;
+          // Find highest plank block in this column and remove it (wall gets shorter)
+          let removed = false;
+          for (let dy = 10; dy >= 2; dy--) {
+            const wb = getBlock(tx, dy, tz);
+            if (wb === BLOCK.PLANKS) {
+              setBlock(tx, dy, tz, BLOCK.AIR);
+              spawnParticles(tx + 0.5, dy + 0.5, tz + 0.5, 0xb89858, 6, 2);
+              playChopSound('wood');
+              removed = true;
+              break;
+            }
+          }
         }
       }
+      z.mesh.rotation.y = Math.atan2(dx, dz);
     }
-    return;
-  }
-  var found = false;
-  for (var vsi = 0; vsi < villagers.length; vsi++) {
-    var v = villagers[vsi];
-    if (v.hp <= 0) continue;
-    var vdx = v.x - wx, vdy = v.y - wy;
-    if (Math.sqrt(vdx * vdx + vdy * vdy) < 16) {
-      var vpdx = v.x - player.x, vpdy = v.y - player.y;
-      if (Math.sqrt(vpdx * vpdx + vpdy * vpdy) > INTERACT_RADIUS) break;
-      openVillagerMenu(v);
-      found = true;
-      break;
-    }
-  }
-  if (!found && !buildMode) {
-    // Check if right-clicking a player-built structure
-    var btx2 = Math.floor(wx / TILE);
-    var bty2 = Math.floor(wy / TILE);
-    var bdist2 = Math.sqrt((btx2*TILE+TILE/2 - player.x)*(btx2*TILE+TILE/2 - player.x) + (bty2*TILE+TILE/2 - player.y)*(bty2*TILE+TILE/2 - player.y));
-    if (bdist2 <= INTERACT_RADIUS) {
-      for (var rbi2 = 0; rbi2 < buildings.length; rbi2++) {
-        var rb = buildings[rbi2];
-        if (rb.type === BTYPE.WALL || rb.type === BTYPE.GATE || rb.type === BTYPE.TREE_FARM) {
-          if (btx2 >= rb.x && btx2 < rb.x + rb.w && bty2 >= rb.y && bty2 < rb.y + rb.h) {
-            openBuildingMenu(rb);
-            found = true;
+
+    // Attack
+    if (targetDist < 1.5 && z.attackTimer <= 0) {
+      z.attackTimer = 1.0;
+      // Damage player or nearest villager
+      if (!player.dead && Math.sqrt((z.x - player.pos.x) ** 2 + (z.z - player.pos.z) ** 2) < 1.5) {
+        player.hp--;
+        player.damageFlash = 0.2;
+        screenShake = 0.3;
+        if (player.hp <= 0) { player.dead = true; player.respawnTimer = 3; }
+      } else {
+        for (const v of villagers) {
+          if (v.hp <= 0) continue;
+          if (Math.sqrt((z.x - v.x) ** 2 + (z.z - v.z) ** 2) < 1.5) {
+            v.hp--;
+            v.damageFlash = 0.3;
+            v.showHealthTimer = 3;
+            if (v.hp <= 0) { v.state = 'dead'; }
             break;
           }
         }
       }
     }
-  }
-  if (!found) {
-    selectedVillager = null;
-  }
-});
 
-canvas.addEventListener('click', function(e) {
-  if (gameOver) return;
-  var wx = mouseWorldX, wy = mouseWorldY;
+    // Walking animation
+    z.mesh.position.set(z.x, 2, z.z);
+    const parts = z.mesh.userData;
+    const swing = Math.sin(z.headBob * 2) * 0.4;
+    parts.legL.rotation.x = swing;
+    parts.legR.rotation.x = -swing;
 
-  if (buildMode && buildType !== null) {
-    var btx = Math.floor(wx / TILE);
-    var bty = Math.floor(wy / TILE);
-    if (btx < 2 || bty < 2 || btx >= MAP_W - 2 || bty >= MAP_H - 2) return;
-    var placeDist = Math.sqrt((btx * TILE + TILE / 2 - player.x) * (btx * TILE + TILE / 2 - player.x) + (bty * TILE + TILE / 2 - player.y) * (bty * TILE + TILE / 2 - player.y));
-    if (placeDist > INTERACT_RADIUS) return;
-    if (!walkable[bty][btx]) return;
-    var opt = null;
-    for (var oi = 0; oi < buildOptions.length; oi++) {
-      if (buildOptions[oi].type === buildType) { opt = buildOptions[oi]; break; }
-    }
-    if (!opt) return;
-    if (stockpile.wood < opt.cost) return;
-    // Don't place if player or villager is standing on the tile
-    var ptx = Math.floor(player.x / TILE), pty = Math.floor(player.y / TILE);
-    if (ptx === btx && pty === bty) return;
-    for (var cvi = 0; cvi < villagers.length; cvi++) {
-      if (villagers[cvi].hp <= 0) continue;
-      var vtx = Math.floor(villagers[cvi].x / TILE), vty = Math.floor(villagers[cvi].y / TILE);
-      if (vtx === btx && vty === bty) return;
-    }
-    stockpile.wood -= opt.cost;
-    var newB = { type: buildType, x: btx, y: bty, w: 1, h: 1, hp: opt.hp, maxHp: opt.hp, built: false, buildProgress: 0 };
-    buildings.push(newB);
-    rebuildWalkable();
-    assignVillagerToBuild(newB);
-    return;
-  }
-
-  var attackRange = 1.2 * TILE;
-  for (var zi = 0; zi < zombies.length; zi++) {
-    var z = zombies[zi];
-    var zdx = z.x - player.x, zdy = z.y - player.y;
-    var zdist = Math.sqrt(zdx * zdx + zdy * zdy);
-    if (zdist < attackRange && zdist <= INTERACT_RADIUS) {
-      z.hp -= 2; z.hurtTimer = 0.2;
-      return;
-    }
-  }
-  for (var ski = 0; ski < skeletons.length; ski++) {
-    var sk = skeletons[ski];
-    var skdx = sk.x - player.x, skdy = sk.y - player.y;
-    var skidist = Math.sqrt(skdx * skdx + skdy * skdy);
-    if (skidist < attackRange && skidist <= INTERACT_RADIUS) {
-      sk.hp -= 2; sk.hurtTimer = 0.2;
-      return;
+    // Zombie health bar
+    if (z.showHealthTimer > 0) {
+      z.showHealthTimer -= dt;
+      if (!z.healthBar) {
+        z.healthBar = createHealthBar();
+        scene.add(z.healthBar);
+      }
+      z.healthBar.visible = true;
+      z.healthBar.position.set(z.x, 3.8, z.z);
+      z.healthBar.lookAt(camera.position);
+      z.healthBar.userData.fg.scale.x = Math.max(0, z.hp / z.maxHp);
+      z.healthBar.userData.fg.position.x = -(1 - z.hp / z.maxHp) / 2;
+    } else if (z.healthBar) {
+      z.healthBar.visible = false;
     }
   }
 
-  var clickTX = Math.floor(wx / TILE);
-  var clickTY = Math.floor(wy / TILE);
-  var clickWorldCX = clickTX * TILE + TILE / 2;
-  var clickWorldCY = clickTY * TILE + TILE / 2;
-  var clickDist = Math.sqrt((clickWorldCX - player.x) * (clickWorldCX - player.x) + (clickWorldCY - player.y) * (clickWorldCY - player.y));
+  // Night survived message
+  if (zombies.length === 0 && zombieSpawnedThisNight && nightMsgTimer <= 0) {
+    nightMsgTimer = 3; // show for 3 seconds
+    document.getElementById('night-msg').textContent = 'Night ' + nightCount + ' Survived!';
+    document.getElementById('night-msg').style.display = 'block';
+  }
+  if (nightMsgTimer > 0) {
+    nightMsgTimer -= dt;
+    if (nightMsgTimer <= 0) {
+      document.getElementById('night-msg').style.display = 'none';
+    }
+  }
+}
 
-  for (var di = 0; di < deposits.length; di++) {
-    var d = deposits[di];
-    if (d.x === clickTX && d.y === clickTY) {
-      if (clickDist > INTERACT_RADIUS) return;
-      if (d.type === 'wood') {
-        var gv = (selectedVillager && selectedVillager.hp > 0 && selectedVillager.state === 'IDLE') ? selectedVillager : findNearestIdleVillager(d.x * TILE, d.y * TILE);
-        if (gv) {
-          gv.state = 'TRAVEL'; gv.task = 'gather';
-          gv.gatherTarget = d;
-          gv.targetX = d.x * TILE + TILE / 2;
-          gv.targetY = d.y * TILE + TILE / 2;
-          gv.statusText = 'Gathering...'; gv.statusTimer = 2;
-          if (selectedVillager === gv) selectedVillager = null;
+function updateVillagers(dt) {
+  for (const v of villagers) {
+    v.headBob += dt * 3;
+    if(!v.stepTimer)v.stepTimer=0;
+
+    const isNight = worldTime >= DAY_LENGTH;
+    // Dead villagers don't update
+    if (v.hp <= 0) {
+      if (v.mesh.visible) { v.mesh.visible = false; }
+      continue;
+    }
+
+    // Unstick villagers: reset invalid states
+    if (v.state === 'chop' && !v.chopTarget) { v.state = 'idle'; v.wanderTimer = 0.5; }
+    if (v.state === 'build' && (!v.buildTarget || v.buildTarget.built)) { v.state = 'idle'; v.wanderTimer = 0.5; v.buildTarget = null; }
+    // Stuck timer: if villager hasn't moved in 2 seconds while in motion state, reset
+    if (!v.stuckCheck) v.stuckCheck = {x: v.x, z: v.z, timer: 0};
+    if (v.state === 'wander' || v.state === 'chop' || v.state === 'build' || v.state === 'go_home') {
+      v.stuckCheck.timer += dt;
+      if (v.stuckCheck.timer > 2) {
+        const moved = Math.abs(v.x - v.stuckCheck.x) + Math.abs(v.z - v.stuckCheck.z);
+        if (moved < 0.3) { v.state = 'idle'; v.wanderTimer = 0.5; v.chopTarget = null; v.buildTarget = null; if(v.chopTarget){choppingTrees.delete(`${Math.floor(v.x)},${Math.floor(v.z)}`);} }
+        v.stuckCheck.x = v.x; v.stuckCheck.z = v.z; v.stuckCheck.timer = 0;
+      }
+    } else { v.stuckCheck.timer = 0; v.stuckCheck.x = v.x; v.stuckCheck.z = v.z; }
+
+    // Night: flee from zombies or go home to sleep
+    if (isNight && v.state !== 'sleeping' && v.state !== 'go_home' && v.state !== 'chop' && v.state !== 'build') {
+      // Check if zombie is nearby (within 15 blocks)
+      let nearestZombie = null, zombieDist = Infinity;
+      for (const z of zombies) {
+        if (z.hp <= 0) continue;
+        const d = Math.sqrt((v.x - z.x) ** 2 + (v.z - z.z) ** 2);
+        if (d < zombieDist) { zombieDist = d; nearestZombie = z; }
+      }
+
+      if (zombieDist < 15) {
+        // Flee from zombie
+        const dx = v.x - nearestZombie.x, dz = v.z - nearestZombie.z;
+        const d = Math.sqrt(dx * dx + dz * dz);
+        if (d > 0) {
+          v.wanderDirX = (dx / d) * 7.5; // sprint away
+          v.wanderDirZ = (dz / d) * 7.5;
+          v.state = 'wander';
+          v.wanderTimer = 1;
+          if (!v.speechTimer || v.speechTimer <= 0) showSpeechBubble(v, 'Help!');
         }
-        return;
-      } else if (d.type === 'stone') {
-        var sv2 = (selectedVillager && selectedVillager.hp > 0 && selectedVillager.state === 'IDLE' && selectedVillager.canMineStone) ? selectedVillager : null;
-        if (!sv2) {
-          for (var svi2 = 0; svi2 < villagers.length; svi2++) {
-            var svv = villagers[svi2];
-            if (svv.hp > 0 && svv.state === 'IDLE' && !svv.sleeping && svv.canMineStone) {
-              sv2 = svv; break;
+      } else if (v.state === 'idle' || v.state === 'wander') {
+        // Head home
+        v.state = 'go_home';
+      }
+    }
+
+    // Go home state
+    if (v.state === 'go_home') {
+      const homeX = v.home.x + 2.5, homeZ = v.home.z + 2.5;
+      const dx = homeX - v.x, dz = homeZ - v.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist < 2) {
+        v.state = 'sleeping';
+        v.mesh.visible = false; // hide while sleeping
+      } else {
+        const spd = 7.5;
+        v.x += (dx / dist) * spd * dt;
+        v.z += (dz / dist) * spd * dt;
+        v.mesh.rotation.y = Math.atan2(dx, dz);
+      }
+    }
+
+    // Sleeping state — wake up when day comes and no zombies
+    if (v.state === 'sleeping') {
+      if (!isNight && zombies.length === 0) {
+        v.state = 'idle';
+        v.wanderTimer = 2;
+        v.mesh.visible = true;
+        // Teleport outside door
+        if(v.home.doorWall==='z-'){v.x=v.home.x+2.5;v.z=v.home.z-1.5;}
+        else if(v.home.doorWall==='z+'){v.x=v.home.x+2.5;v.z=v.home.z+5.5;}
+        else if(v.home.doorWall==='x-'){v.x=v.home.x-1.5;v.z=v.home.z+2.5;}
+        else{v.x=v.home.x+5.5;v.z=v.home.z+2.5;}
+      }
+    }
+
+    if (v.state === 'sleeping' || v.state === 'go_home') continue;
+
+    if (v.state === 'idle') {
+      v.wanderTimer -= dt;
+      if (v.wanderTimer <= 0) {
+        v.state = 'wander';
+        v.wanderTimer = 3 + Math.random() * 4;
+        // 60% chance to walk toward nearest road
+        let ang = Math.random() * Math.PI * 2;
+        if (Math.random() < 0.6) {
+          const vx=Math.floor(v.x),vz=Math.floor(v.z);
+          // Check cardinal directions for road blocks within 8 blocks
+          let bestDir=null,bestDist=Infinity;
+          const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+          for(const d of dirs){for(let i=1;i<=8;i++){
+            if(isRoad(vx+d[0]*i,vz+d[1]*i)){const dist=i;if(dist<bestDist){bestDist=dist;bestDir=d;}break;}
+          }}
+          if(bestDir)ang=Math.atan2(bestDir[1],bestDir[0])+(Math.random()-0.5)*0.8;
+        }
+        v.wanderDirX = Math.cos(ang) * 4.5;
+        v.wanderDirZ = Math.sin(ang) * 4.5;
+      }
+    } else if (v.state === 'wander') {
+      v.wanderTimer -= dt;
+      const newX = v.x + v.wanderDirX * dt;
+      const newZ = v.z + v.wanderDirZ * dt;
+
+      // Keep within village area (don't wander too far from home)
+      const homeX = v.home.x + 2.5, homeZ = v.home.z + 2.5;
+      const distFromHome = Math.sqrt((newX - homeX) ** 2 + (newZ - homeZ) ** 2);
+
+      if (distFromHome < 20) {
+        // Check collision
+        const tx = Math.floor(newX), tz = Math.floor(newZ);
+        const b2=getBlock(tx,2,tz),b3=getBlock(tx,3,tz);
+        // Villagers can walk on planks (tree farm floor) and through doors/beds/leaves
+        const passable2=b2===BLOCK.AIR||b2===BLOCK.DOOR||b2===BLOCK.BED||b2===BLOCK.LEAVES||b2===BLOCK.PLANKS||b2===BLOCK.GRASS;
+        const passable3=b3===BLOCK.AIR||b3===BLOCK.DOOR||b3===BLOCK.BED||b3===BLOCK.LEAVES;
+        const blocked=!passable2||!passable3;
+        if (!blocked) {
+          v.x = newX;
+          v.z = newZ;
+        } else {
+          v.wanderDirX = -v.wanderDirX + (Math.random() - 0.5);
+          v.wanderDirZ = -v.wanderDirZ + (Math.random() - 0.5);
+        }
+      } else {
+        const dx = homeX - v.x, dz = homeZ - v.z;
+        const d = Math.sqrt(dx * dx + dz * dz);
+        v.wanderDirX = (dx / d) * 4.5;
+        v.wanderDirZ = (dz / d) * 4.5;
+      }
+
+      if (v.wanderTimer <= 0) {
+        v.state = 'idle';
+        v.wanderTimer = 2 + Math.random() * 3;
+      }
+    } else if (v.state === 'chop') {
+      if (!v.chopTarget) { v.state = 'idle'; v.wanderTimer = 2; }
+      else {
+        const dx = v.chopTarget.x - v.x, dz = v.chopTarget.z - v.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        // Check if tree still exists (another villager may have destroyed it)
+        let treeStillExists=false;
+        for(let cy=2;cy<10;cy++){if(getBlock(v.chopTarget.bx,cy,v.chopTarget.bz)===BLOCK.WOOD){treeStillExists=true;break;}}
+        if(!treeStillExists){choppingTrees.delete(`${v.chopTarget.bx},${v.chopTarget.bz}`);v.chopTarget=null;v.chopTimer=0;v.state='idle';v.wanderTimer=1;}
+        if (dist < 1.5) {
+          v.chopTimer = (v.chopTimer || 0) + dt;
+          if (v.chopTimer >= 1.5) {
+            playChopSound('wood');
+            const tx = v.chopTarget.bx, tz = v.chopTarget.bz;
+            spawnParticles(tx+0.5, 4, tz+0.5, 0x8a6b3e, 8, 3); // brown wood chips
+            spawnParticles(tx+0.5, 6, tz+0.5, 0x3a8a20, 10, 4); // leaf particles
+            for (let y = 2; y < 14; y++) {
+              if (getBlock(tx, y, tz) === BLOCK.WOOD) setBlock(tx, y, tz, BLOCK.AIR);
+              for (let lx = -2; lx <= 2; lx++) {
+                for (let lz = -2; lz <= 2; lz++) {
+                  if (getBlock(tx + lx, y, tz + lz) === BLOCK.LEAVES) setBlock(tx + lx, y, tz + lz, BLOCK.AIR);
+                }
+              }
+            }
+            // Check if it's a tree farm
+            let isFarm = false;
+            for (const bs of buildSites) {
+              if (bs.built && tx === bs.x + 2 && tz === bs.z + 2) { isFarm = true; break; }
+            }
+            if (isFarm) {
+              inventory.wood += 2;
+              // Regrow tree instantly (farm tree starts at y=3)
+              for (let y = 3; y < 7; y++) setBlock(tx, y, tz, BLOCK.WOOD);
+              for (let ly = 6; ly <= 8; ly++) {
+                const r = ly <= 7 ? 2 : 1;
+                for (let lx = -r; lx <= r; lx++) { for (let lz = -r; lz <= r; lz++) {
+                  if (lx === 0 && lz === 0 && ly <= 7) continue;
+                  if(ly<WORLD_HEIGHT) setBlock(tx + lx, ly, tz + lz, BLOCK.LEAVES);
+                }}
+              }
+            } else {
+              inventory.wood += 3;
+            }
+            choppingTrees.delete(`${tx},${tz}`);
+            v.chopTarget = null;
+            v.chopTimer = 0;
+            v.state = 'idle';
+            v.wanderTimer = 1 + Math.random() * 2;
+            showSpeechBubble(v, 'Done!');
+            // Nudge villager away — try directions until one is clear
+            for(let ni=0;ni<8;ni++){
+              const na=ni*Math.PI/4;const nx=v.x+Math.cos(na)*2,nz=v.z+Math.sin(na)*2;
+              const ntx=Math.floor(nx),ntz=Math.floor(nz);
+              const nb2=getBlock(ntx,2,ntz),nb3=getBlock(ntx,3,ntz);
+              if((nb2===BLOCK.AIR||nb2===BLOCK.DOOR||nb2===BLOCK.LEAVES||nb2===BLOCK.PLANKS||nb2===BLOCK.GRASS)
+                &&(nb3===BLOCK.AIR||nb3===BLOCK.DOOR||nb3===BLOCK.LEAVES)){v.x=nx;v.z=nz;break;}
             }
           }
+        } else {
+          v.chopTimer = 0;
+          const spd = 7.5;
+          v.x += (dx / dist) * spd * dt;
+          v.z += (dz / dist) * spd * dt;
+          v.mesh.rotation.y = Math.atan2(dx, dz);
         }
-        if (sv2) {
-          sv2.state = 'TRAVEL'; sv2.task = 'gather';
-          sv2.gatherTarget = d;
-          sv2.targetX = d.x * TILE + TILE / 2;
-          sv2.targetY = d.y * TILE + TILE / 2;
-          sv2.statusText = 'Mining...'; sv2.statusTimer = 2;
-          if (selectedVillager === sv2) selectedVillager = null;
+      }
+    } else if (v.state === 'build') {
+      if (!v.buildTarget || v.buildTarget.built) { v.state = 'idle'; v.wanderTimer = 2; v.buildTarget = null; }
+      else {
+        const bt = v.buildTarget;
+        // Stand next to the build, not inside it
+        let tx, tz;
+        if (bt.type === 'wall' || bt.type === 'gate') {
+          tx = bt.x + 3; tz = bt.z + 1.5; // stand in front of wall
+        } else {
+          tx = bt.x + 2.5; tz = bt.z + 2.5;
         }
-        return;
+        const dx = tx - v.x, dz = tz - v.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < 3) {
+          // Working on build — only add OUR contribution (dt * 1), not multiplied
+          bt.progress += dt;
+          if (bt.progress >= bt.maxProgress) {
+            bt.built = true;
+            if (bt.type === 'treefarm') {
+            // Place tree farm blocks — planks border at y=2, grass interior at y=2
+            for (let dx2 = 0; dx2 < 5; dx2++) {
+              for (let dz2 = 0; dz2 < 5; dz2++) {
+                if (dx2 === 0 || dx2 === 4 || dz2 === 0 || dz2 === 4) {
+                  setBlock(bt.x + dx2, 2, bt.z + dz2, BLOCK.PLANKS);
+                } else {
+                  setBlock(bt.x + dx2, 2, bt.z + dz2, BLOCK.GRASS);
+                }
+              }
+            }
+            // Tree in center (starts at y=3 since floor is y=2)
+            const cx2 = bt.x + 2, cz2 = bt.z + 2;
+            for (let y = 3; y < 7; y++) setBlock(cx2, y, cz2, BLOCK.WOOD);
+            for (let ly = 6; ly <= 8; ly++) {
+              const r = ly <= 7 ? 2 : 1;
+              for (let lx = -r; lx <= r; lx++) { for (let lz = -r; lz <= r; lz++) {
+                if (lx === 0 && lz === 0 && ly <= 7) continue;
+                if(ly<WORLD_HEIGHT) setBlock(cx2 + lx, ly, cz2 + lz, BLOCK.LEAVES);
+              }}
+            }
+            } else if (bt.type === 'wall') {
+              // 6 wide, 6 tall wall — rotation determines axis
+              for (let dx2 = 0; dx2 < 6; dx2++) {
+                for (let dy = 2; dy < 8; dy++) {
+                  if(bt.rotation===0)setBlock(bt.x + dx2, dy, bt.z, BLOCK.PLANKS);
+                  else setBlock(bt.x, dy, bt.z + dx2, BLOCK.PLANKS);
+                }
+              }
+            } else if (bt.type === 'gate') {
+              // 6 wide, 6 tall wall with door opening — rotation determines axis
+              const facing=bt.rotation===0?'z-':'x-';
+              for (let dx2 = 0; dx2 < 6; dx2++) {
+                for (let dy = 2; dy < 8; dy++) {
+                  const isDoor = (dx2 === 2 || dx2 === 3) && dy >= 2 && dy <= 3;
+                  if(bt.rotation===0){
+                    if(isDoor){setBlock(bt.x+dx2,dy,bt.z,BLOCK.DOOR);doorData.set(`${bt.x+dx2},${dy},${bt.z}`,{facing,open:false});}
+                    else setBlock(bt.x+dx2,dy,bt.z,BLOCK.PLANKS);
+                  } else {
+                    if(isDoor){setBlock(bt.x,dy,bt.z+dx2,BLOCK.DOOR);doorData.set(`${bt.x},${dy},${bt.z+dx2}`,{facing,open:false});}
+                    else setBlock(bt.x,dy,bt.z+dx2,BLOCK.PLANKS);
+                  }
+                }
+              }
+            }
+            // Release ALL builders working on this site
+            for (const ov of villagers) {
+              if (ov.state === 'build' && ov.buildTarget === bt) {
+                ov.state = 'idle'; ov.wanderTimer = 2; ov.buildTarget = null;
+                showSpeechBubble(ov, 'Done!');
+              }
+            }
+          }
+        } else {
+          const spd = 7.5;
+          v.x += (dx / dist) * spd * dt;
+          v.z += (dz / dist) * spd * dt;
+          v.mesh.rotation.y = Math.atan2(dx, dz);
+        }
       }
     }
-  }
 
-  for (var fbi = 0; fbi < buildings.length; fbi++) {
-    var bf = buildings[fbi];
-    if (bf.type === BTYPE.TREE_FARM && bf.built && clickTX >= bf.x && clickTX < bf.x + bf.w && clickTY >= bf.y && clickTY < bf.y + bf.h) {
-      if (clickDist > INTERACT_RADIUS) return;
-      var fv = (selectedVillager && selectedVillager.hp > 0 && selectedVillager.state === 'IDLE') ? selectedVillager : findNearestIdleVillager(bf.x * TILE, bf.y * TILE);
-      if (fv) {
-        fv.state = 'TRAVEL'; fv.task = 'gather_farm';
-        fv.gatherTarget = bf;
-        fv.targetX = bf.x * TILE + TILE / 2;
-        fv.targetY = (bf.y + 1) * TILE + TILE / 2;
-        fv.statusText = 'Farming...'; fv.statusTimer = 2;
-        if (selectedVillager === fv) selectedVillager = null;
+    // Villager footstep sounds (throttled — only nearest villager plays, softer)
+    const vIsMoving=v.state==='wander'||v.state==='chop'||v.state==='build';
+    if(vIsMoving){v.stepTimer+=dt*0.6;const dToPlayer=Math.sqrt((v.x-player.pos.x)**2+(v.z-player.pos.z)**2);if(v.stepTimer>=1.0&&dToPlayer<12&&Math.random()<0.2){v.stepTimer=0;playFootstep(getFootstepType(Math.floor(v.x),Math.floor(v.z)));spawnParticles(v.x,2.1,v.z,0x999966,1,0.3);}}else{v.stepTimer=0;}
+    // Update mesh position
+    v.mesh.position.set(v.x, 2, v.z);
+    // Face movement direction
+    if (v.state === 'wander' && (Math.abs(v.wanderDirX) > 0.1 || Math.abs(v.wanderDirZ) > 0.1)) {
+      v.mesh.rotation.y = Math.atan2(v.wanderDirX, v.wanderDirZ);
+    }
+    // Walking animation — swing legs and arms when moving
+    const isMoving = v.state === 'wander' || v.state === 'chop' && v.chopTimer === 0 || v.state === 'build';
+    const parts = v.mesh.userData;
+    if (parts) {
+      if (isMoving && (Math.abs(v.wanderDirX) > 0.1 || Math.abs(v.wanderDirZ) > 0.1 || v.state === 'chop' || v.state === 'build')) {
+        const swing = Math.sin(v.headBob * 2.5) * 0.6;
+        parts.legL.rotation.x = swing;
+        parts.legR.rotation.x = -swing;
+        parts.armL.rotation.x = -swing;
+        parts.armR.rotation.x = swing;
+      } else {
+        parts.legL.rotation.x = 0;
+        parts.legR.rotation.x = 0;
+        parts.armL.rotation.x = 0;
+        parts.armR.rotation.x = 0;
       }
-      return;
+    }
+
+    // Damage flash
+    if (v.damageFlash > 0) {
+      v.damageFlash -= dt;
+      v.mesh.children.forEach(c => { if(c.material) c.material.color.setRGB(1, 0.3, 0.3); });
+    }
+
+    // Health bar
+    if (v.showHealthTimer > 0) {
+      v.showHealthTimer -= dt;
+      if (!v.healthBar) {
+        v.healthBar = createHealthBar();
+        scene.add(v.healthBar);
+      }
+      v.healthBar.visible = true;
+      v.healthBar.position.set(v.x, 3.8, v.z);
+      v.healthBar.lookAt(camera.position);
+      v.healthBar.userData.fg.scale.x = Math.max(0, v.hp / v.maxHp);
+      v.healthBar.userData.fg.position.x = -(1 - v.hp / v.maxHp) / 2;
+    } else if (v.healthBar) {
+      v.healthBar.visible = false;
+    }
+
+    // Speech bubbles
+    if (v.speechTimer > 0) {
+      v.speechTimer -= dt;
+      if (v.speechMesh) { v.speechMesh.position.set(v.x, 4.2, v.z); }
+      if (v.speechTimer <= 0 && v.speechMesh) { scene.remove(v.speechMesh); v.speechMesh = null; }
     }
   }
+}
 
-  if (buildMode && buildType !== null) {
-    if (clickDist > INTERACT_RADIUS) return;
+function raycast(origin,dir,maxD){const dx=dir.x,dy=dir.y,dz=dir.z;let x=Math.floor(origin.x),y=Math.floor(origin.y),z=Math.floor(origin.z);const sx=dx>0?1:-1,sy=dy>0?1:-1,sz=dz>0?1:-1;let tmx=dx!==0?((dx>0?x+1:x)-origin.x)/dx:Infinity,tmy=dy!==0?((dy>0?y+1:y)-origin.y)/dy:Infinity,tmz=dz!==0?((dz>0?z+1:z)-origin.z)/dz:Infinity;const tdx=dx!==0?sx/dx:Infinity,tdy=dy!==0?sy/dy:Infinity,tdz=dz!==0?sz/dz:Infinity;let d=0;for(let i=0;i<200&&d<maxD;i++){const b=getBlock(x,y,z);if(b!==BLOCK.AIR&&b!==BLOCK.LEAVES)return{x,y,z,block:b};if(tmx<tmy){if(tmx<tmz){d=tmx;x+=sx;tmx+=tdx;}else{d=tmz;z+=sz;tmz+=tdz;}}else{if(tmy<tmz){d=tmy;y+=sy;tmy+=tdy;}else{d=tmz;z+=sz;tmz+=tdz;}}}return null;}
+
+// Modified raycast that also hits leaves and wood
+function raycastTree(origin,dir,maxD){const dx=dir.x,dy=dir.y,dz=dir.z;let x=Math.floor(origin.x),y=Math.floor(origin.y),z=Math.floor(origin.z);const sx=dx>0?1:-1,sy=dy>0?1:-1,sz=dz>0?1:-1;let tmx=dx!==0?((dx>0?x+1:x)-origin.x)/dx:Infinity,tmy=dy!==0?((dy>0?y+1:y)-origin.y)/dy:Infinity,tmz=dz!==0?((dz>0?z+1:z)-origin.z)/dz:Infinity;const tdx=dx!==0?sx/dx:Infinity,tdy=dy!==0?sy/dy:Infinity,tdz=dz!==0?sz/dz:Infinity;let d=0;for(let i=0;i<200&&d<maxD;i++){const b=getBlock(x,y,z);if(b!==BLOCK.AIR)return{x,y,z,block:b};if(tmx<tmy){if(tmx<tmz){d=tmx;x+=sx;tmx+=tdx;}else{d=tmz;z+=sz;tmz+=tdz;}}else{if(tmy<tmz){d=tmy;y+=sy;tmy+=tdy;}else{d=tmz;z+=sz;tmz+=tdz;}}}return null;}
+
+// ============================================================
+// COMPASS
+// ============================================================
+const compassCanvas=document.getElementById('compass'),compassCtx=compassCanvas.getContext('2d');
+const cardinals=[{label:'N',yaw:0,col:'#ff4444'},{label:'NE',yaw:-Math.PI/4,col:'#999'},{label:'E',yaw:-Math.PI/2,col:'#fff'},{label:'SE',yaw:-3*Math.PI/4,col:'#999'},{label:'S',yaw:Math.PI,col:'#fff'},{label:'SW',yaw:3*Math.PI/4,col:'#999'},{label:'W',yaw:Math.PI/2,col:'#fff'},{label:'NW',yaw:Math.PI/4,col:'#999'}];
+function normA(a){while(a>Math.PI)a-=2*Math.PI;while(a<-Math.PI)a+=2*Math.PI;return a;}
+function drawCompass(){
+  const cw=compassCanvas.width,ch=compassCanvas.height;compassCtx.clearRect(0,0,cw,ch);
+  compassCtx.fillStyle='rgba(0,0,0,0.55)';compassCtx.fillRect(0,0,cw,ch);
+  compassCtx.fillStyle='rgba(255,255,255,0.9)';compassCtx.fillRect(cw/2,ch-8,1,8);
+  const ppr=cw/Math.PI;compassCtx.textAlign='center';
+  for(const cd of cardinals){let rel=normA(cd.yaw-player.yaw);const sx=cw/2-rel*ppr;if(sx<-30||sx>cw+30)continue;compassCtx.fillStyle=cd.col;compassCtx.font=cd.label.length===1?'bold 15px Courier New':'12px Courier New';compassCtx.fillRect(sx,ch-6,1,6);compassCtx.fillText(cd.label,sx,ch-9);}
+  const dx=0.5-player.pos.x,dz=0.5-player.pos.z,dist=Math.sqrt(dx*dx+dz*dz);
+  const ty=Math.atan2(-dx,-dz),rel=normA(ty-player.yaw),vx=cw/2-rel*ppr;
+  if(vx>=-10&&vx<=cw+10){compassCtx.fillStyle='#4af';compassCtx.beginPath();compassCtx.moveTo(vx,2);compassCtx.lineTo(vx-6,10);compassCtx.lineTo(vx+6,10);compassCtx.fill();compassCtx.font='bold 10px Courier New';compassCtx.fillStyle='#8cf';compassCtx.fillText('Village '+Math.round(dist)+'m',vx,21);}
+
+  // Zombie markers on compass
+  for (const z of zombies) {
+    if (z.hp <= 0) continue;
+    const zdx = z.x - player.pos.x, zdz = z.z - player.pos.z;
+    const zdist = Math.sqrt(zdx*zdx + zdz*zdz);
+    if (zdist > 60) continue; // only show nearby
+    const zy = Math.atan2(-zdx, -zdz);
+    const zrel = normA(zy - player.yaw);
+    const zsx = cw/2 - zrel * ppr;
+    if (zsx >= 0 && zsx <= cw) {
+      compassCtx.fillStyle = '#f44';
+      compassCtx.beginPath();
+      compassCtx.moveTo(zsx, 2);
+      compassCtx.lineTo(zsx - 3, 7);
+      compassCtx.lineTo(zsx + 3, 7);
+      compassCtx.fill();
+    }
   }
+}
 
-  if (selectedVillager) selectedVillager = null;
+// ============================================================
+// PLAYER & INPUT
+// ============================================================
+const player={pos:new THREE.Vector3(0.5,GROUND_LEVEL+1+1.62,0.5),vel:new THREE.Vector3(0,0,0),yaw:0,pitch:0,onGround:false,height:1.62,width:0.3,hp:5,maxHp:5,dead:false,respawnTimer:0,attackCooldown:0,damageFlash:0};
+const inventory={wood:0,stone:0};
+camera.position.copy(player.pos);
+const keys={};let mouseDX=0,mouseDZ=0,rightClick=false,leftClick=false;
+document.addEventListener('keydown',e=>{
+  keys[e.code]=true;
+  if (e.code === 'KeyE' && document.pointerLockElement) {
+    document.getElementById('build-menu').classList.add('open');
+    document.getElementById('instructions').style.display = 'none';
+    document.exitPointerLock();
+    buildMode = true;
+  }
+  if (e.code === 'KeyX') {
+    if (buildMode) { closeBuildMenu(); }
+  }
+  if (e.code === 'Escape') {
+    if (buildMode) { closeBuildMenu(); }
+    if (menuVillager) { closeVillagerMenu(); }
+    placingBuild = null;
+    placeGhost.visible = false;
+  }
 });
+document.addEventListener('keyup',e=>{keys[e.code]=false;});
+document.addEventListener('mousemove',e=>{if(document.pointerLockElement){mouseDX+=e.movementX;mouseDZ+=e.movementY;}});
+document.addEventListener('mousedown',e=>{if(document.pointerLockElement&&e.button===2)rightClick=true;if(document.pointerLockElement&&e.button===0)leftClick=true;});
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('wheel',e=>{if(placingBuild){buildRotation=(buildRotation+1)%2;e.preventDefault();}});
+const instructions=document.getElementById('instructions');
+instructions.addEventListener('click',()=>{document.documentElement.requestFullscreen().catch(()=>{});renderer.domElement.requestPointerLock();});
+document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement){for(const k in keys)keys[k]=false;if(!buildMode&&!menuVillager)instructions.style.display='flex';}else{instructions.style.display='none';}});
 
-function findNearestIdleVillager(wx, wy) {
-  var best = null, bestDist = Infinity;
-  for (var i = 0; i < villagers.length; i++) {
-    var v = villagers[i];
-    if (v.hp <= 0 || v.state !== 'IDLE' || v.sleeping) continue;
-    var dx = v.x - wx, dy = v.y - wy;
-    var d = dx * dx + dy * dy;
-    if (d < bestDist) { bestDist = d; best = v; }
-  }
-  return best;
+function isBlockSolid(wx,wy,wz){const b=getBlock(wx,wy,wz);if(b===BLOCK.AIR||b===BLOCK.BED||b===BLOCK.LEAVES)return false;if(b===BLOCK.DOOR){const dd=doorData.get(`${wx},${wy},${wz}`);return dd?!dd.open:false;}return true;}
+function collideAxis(pos,vel,axis){const hw=player.width,h=player.height;if(vel[axis]===0)return;const np=pos.clone();np[axis]+=vel[axis];const mx=Math.floor(np.x-hw),Mx=Math.floor(np.x+hw),my=Math.floor(np.y-h),My=Math.floor(np.y+0.1),mz=Math.floor(np.z-hw),Mz=Math.floor(np.z+hw);for(let bx=mx;bx<=Mx;bx++){for(let by=my;by<=My;by++){for(let bz=mz;bz<=Mz;bz++){if(isBlockSolid(bx,by,bz)){if(np.x+hw>bx&&np.x-hw<bx+1&&np.y+0.1>by&&np.y-h<by+1&&np.z+hw>bz&&np.z-hw<bz+1){if(axis==='y'&&vel.y<0)player.onGround=true;vel[axis]=0;return;}}}}}pos[axis]=np[axis];}
+
+function updateChunks(){const pcx=Math.floor(player.pos.x/CHUNK_SIZE),pcz=Math.floor(player.pos.z/CHUNK_SIZE);for(let dx=-RENDER_DIST;dx<=RENDER_DIST;dx++){for(let dz=-RENDER_DIST;dz<=RENDER_DIST;dz++){if(dx*dx+dz*dz>RENDER_DIST*RENDER_DIST)continue;const cx=pcx+dx,cz=pcz+dz,key=chunkKey(cx,cz);if(!chunks.has(key))chunks.set(key,{blocks:generateChunk(cx,cz),mesh:null,dirty:true});}}let built=0;for(const[key,chunk]of chunks){if(chunk.dirty&&built<4){const[cx,cz]=key.split(',').map(Number);if((cx-pcx)**2+(cz-pcz)**2<=(RENDER_DIST+1)**2){buildChunkMesh(cx,cz);built++;}}}for(const[key,chunk]of chunks){const[cx,cz]=key.split(',').map(Number);if((cx-pcx)**2+(cz-pcz)**2>(RENDER_DIST+2)**2){if(chunk.mesh){scene.remove(chunk.mesh);chunk.mesh.geometry.dispose();}chunks.delete(key);}}}
+
+function updateHotbar(){
+  document.getElementById('hb-wood-ct').textContent=inventory.wood;
+  document.getElementById('hb-stone-ct').textContent=inventory.stone;
 }
 
-function findWalkableAdjacentTile(tx, ty) {
-  // Check 4 cardinal directions, then 4 diagonals for a walkable spot
-  var dirs = [[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,1],[1,-1],[-1,-1]];
-  for (var di = 0; di < dirs.length; di++) {
-    var ax = tx + dirs[di][0], ay = ty + dirs[di][1];
-    if (ax >= 0 && ax < MAP_W && ay >= 0 && ay < MAP_H && walkable[ay][ax]) {
-      return { x: ax * TILE + TILE / 2, y: ay * TILE + TILE / 2 };
+function updateHearts() {
+  const hearts = document.querySelectorAll('.heart');
+  hearts.forEach((h, i) => { h.style.opacity = i < player.hp ? '1' : '0.2'; });
+}
+
+// Villager menu handlers
+document.getElementById('vm-chop').onclick = () => {
+  if (menuVillager && menuVillager.state !== 'chop') {
+    // Find nearest tree to the villager
+    let nearTree = null, nearDist = Infinity;
+    for (let sx = -30; sx <= 30; sx += 3) {
+      for (let sz = -30; sz <= 30; sz += 3) {
+        const wx = Math.floor(menuVillager.x) + sx, wz = Math.floor(menuVillager.z) + sz;
+        if (getBlock(wx, 2, wz) === BLOCK.WOOD) {
+          // Skip house posts
+          let isPost=false;
+          for(const h of HOUSES){const lx2=wx-h.x,lz2=wz-h.z;if((lx2===0||lx2===4)&&(lz2===0||lz2===4)&&lx2>=0&&lz2>=0){isPost=true;break;}}
+          if(isPost)continue;
+          // Verify it's a tree (4+ blocks tall or has leaves)
+          let woodH=0;for(let cy=2;cy<10;cy++){if(getBlock(wx,cy,wz)===BLOCK.WOOD)woodH++;else break;}
+          let hasLeaves=woodH>=4;
+          if(!hasLeaves){for(let cy=3;cy<10;cy++){for(let lx=-2;lx<=2;lx++){for(let lz=-2;lz<=2;lz++){if(getBlock(wx+lx,cy,wz+lz)===BLOCK.LEAVES)hasLeaves=true;}}}}
+          if (hasLeaves && !choppingTrees.has(`${wx},${wz}`)) {
+            const d = Math.abs(wx - menuVillager.x) + Math.abs(wz - menuVillager.z);
+            if (d < nearDist) { nearDist = d; nearTree = {x:wx, z:wz}; }
+          }
+        }
+      }
+    }
+    if (nearTree) {
+      menuVillager.state = 'chop';
+      menuVillager.chopTarget = {x:nearTree.x+0.5, z:nearTree.z+0.5, bx:nearTree.x, bz:nearTree.z};
+      menuVillager.chopTimer = 0;
+      choppingTrees.add(`${nearTree.x},${nearTree.z}`);
     }
   }
-  return { x: tx * TILE + TILE / 2, y: (ty + 1) * TILE + TILE / 2 };
-}
-
-function assignVillagerToBuild(building) {
-  var v = (selectedVillager && selectedVillager.hp > 0 && selectedVillager.state === 'IDLE') ? selectedVillager : findNearestIdleVillager(building.x * TILE, building.y * TILE);
-  if (v) {
-    var adj = findWalkableAdjacentTile(building.x, building.y);
-    v.state = 'TRAVEL'; v.task = 'build';
-    v.buildTarget = building;
-    v.targetX = adj.x;
-    v.targetY = adj.y;
-    v.stuckTimer = 0; v.lastDistToTarget = 9999;
-    v.statusText = 'Building...'; v.statusTimer = 2;
-    if (selectedVillager === v) selectedVillager = null;
-  }
-}
-
+  closeVillagerMenu();
+};
+document.getElementById('vm-build').onclick = () => { closeVillagerMenu(); };
+document.getElementById('vm-close').onclick = () => { closeVillagerMenu(); };
 function closeVillagerMenu() {
   document.getElementById('villager-menu').style.display = 'none';
   menuVillager = null;
+  setTimeout(() => { renderer.domElement.requestPointerLock(); }, 50);
 }
 
-var menuBuilding = null;
-function closeBuildingMenu() {
-  document.getElementById('building-menu').style.display = 'none';
-  menuBuilding = null;
+// Build menu handlers
+let noMatsTimer=0;
+function showNoMats(){
+  document.getElementById('no-mats-msg').style.display='block';
+  noMatsTimer=2;
 }
-function openBuildingMenu(b) {
-  menuBuilding = b;
-  var names = {};
-  names[BTYPE.WALL] = 'Wooden Wall';
-  names[BTYPE.GATE] = 'Wooden Gate';
-  names[BTYPE.TREE_FARM] = 'Tree Farm';
-  var refunds = {};
-  refunds[BTYPE.WALL] = '3 wood';
-  refunds[BTYPE.GATE] = '3 wood';
-  refunds[BTYPE.TREE_FARM] = '5 wood';
-  var panel = document.getElementById('building-menu');
-  var name = names[b.type] || 'Building';
-  var refund = refunds[b.type] || '2 wood';
-  panel.innerHTML = '<div class="bm-title">' + name + '</div>' +
-    '<div class="bm-info">HP: ' + Math.ceil(b.hp) + ' / ' + b.maxHp + '<br>' +
-    'Status: ' + (b.built ? 'Built' : 'Under construction') + '</div>' +
-    '<button class="bm-btn bm-salvage" id="bm-salvage">Salvage (+ ' + refund + ')</button>' +
-    '<button class="bm-btn bm-close" id="bm-close">Close</button>';
-  panel.style.display = 'block';
-  document.getElementById('bm-salvage').onclick = function() {
-    if (!menuBuilding) return;
-    var bi = buildings.indexOf(menuBuilding);
-    if (bi >= 0) {
-      if (menuBuilding.type === BTYPE.TREE_FARM) { stockpile.wood += 5; }
-      else { stockpile.wood += 3; }
-      buildings.splice(bi, 1);
-      rebuildWalkable();
-    }
-    closeBuildingMenu();
-  };
-  document.getElementById('bm-close').onclick = closeBuildingMenu;
+document.getElementById('bm-treefarm').onclick = () => {
+  if (inventory.wood >= 10) { placingBuild = 'treefarm'; closeBuildMenu(true); }
+  else { showNoMats(); }
+};
+document.getElementById('bm-wall').onclick = () => {
+  if (inventory.wood >= 5) { placingBuild = 'wall'; closeBuildMenu(true); }
+  else { showNoMats(); }
+};
+document.getElementById('bm-gate').onclick = () => {
+  if (inventory.wood >= 5) { placingBuild = 'gate'; closeBuildMenu(true); }
+  else { showNoMats(); }
+};
+document.getElementById('bm-close').onclick = () => { closeBuildMenu(false); };
+function closeBuildMenu(keepPlacing) {
+  document.getElementById('build-menu').classList.remove('open');
+  buildMode = false;
+  if (!keepPlacing) placingBuild = null;
+  // Small delay to avoid fullscreen exit when re-acquiring pointer lock
+  setTimeout(() => { renderer.domElement.requestPointerLock(); }, 50);
 }
 
-function openVillagerMenu(v) {
-  menuVillager = v;
-  var panel = document.getElementById('villager-menu');
-  document.getElementById('vm-title').textContent = 'Villager #' + (v.id + 1);
-  var stateStr = v.sleeping ? 'Sleeping' : v.state;
-  if (v.isWarrior) stateStr += ' [Warrior]';
-  if (v.canMineStone) stateStr += ' [Miner]';
-  document.getElementById('vm-info').innerHTML =
-    'HP: ' + v.hp + ' / ' + v.maxHp + '<br>State: ' + stateStr;
-  var stoneBtn = document.getElementById('vm-upgrade-stone');
-  var warriorBtn = document.getElementById('vm-upgrade-warrior');
-  stoneBtn.style.display = v.canMineStone ? 'none' : 'block';
-  stoneBtn.textContent = 'Upgrade: Stone Miner (3 wood)' + (stockpile.wood < 3 ? ' [need wood]' : '');
-  warriorBtn.style.display = v.isWarrior ? 'none' : 'block';
-  warriorBtn.textContent = 'Upgrade: Warrior (5 wood)' + (stockpile.wood < 5 ? ' [need wood]' : '');
-  panel.style.display = 'block';
-}
-
-document.getElementById('vm-close').addEventListener('click', function() { closeVillagerMenu(); });
-
-document.getElementById('vm-gather').addEventListener('click', function() {
-  if (!menuVillager) return;
-  selectedVillager = menuVillager;
-  menuVillager.statusText = 'Selected'; menuVillager.statusTimer = 1.5;
-  closeVillagerMenu();
-});
-
-document.getElementById('vm-upgrade-stone').addEventListener('click', function() {
-  if (!menuVillager) return;
-  if (menuVillager.canMineStone) return;
-  if (stockpile.wood < 3) return;
-  stockpile.wood -= 3;
-  menuVillager.canMineStone = true;
-  openVillagerMenu(menuVillager);
-});
-
-document.getElementById('vm-upgrade-warrior').addEventListener('click', function() {
-  if (!menuVillager) return;
-  if (menuVillager.isWarrior) return;
-  if (stockpile.wood < 5) return;
-  stockpile.wood -= 5;
-  menuVillager.isWarrior = true;
-  openVillagerMenu(menuVillager);
-});
-
-function updateCamera() {
-  var viewW = canvas.width / ZOOM;
-  var viewH = canvas.height / ZOOM;
-  camera.x = player.x - viewW / 2;
-  camera.y = player.y - viewH / 2;
-  camera.x = Math.max(0, Math.min(WORLD_W - viewW, camera.x));
-  camera.y = Math.max(0, Math.min(WORLD_H - viewH, camera.y));
-}
-
-function canMoveTo(px, py, size, useEnemyWalk) {
-  var half = size / 2;
-  var corners = [
-    [px - half, py - half], [px + half, py - half],
-    [px - half, py + half], [px + half, py + half]
-  ];
-  var wk = useEnemyWalk ? enemyWalkable : walkable;
-  for (var i = 0; i < corners.length; i++) {
-    var ctX = Math.floor(corners[i][0] / TILE);
-    var ctY = Math.floor(corners[i][1] / TILE);
-    if (ctX < 0 || ctY < 0 || ctX >= MAP_W || ctY >= MAP_H) return false;
-    if (!wk[ctY][ctX]) return false;
+const clock=new THREE.Clock();const debugEl=document.getElementById('debug');let frameCount=0,fpsTime=0,fps=0;
+function update(dt){
+  if(!document.pointerLockElement)return;
+  if(gameOver){
+    debugEl.textContent = 'GAME OVER — All villagers have perished!';
+    return;
   }
-  return true;
-}
+  player.yaw-=mouseDX*0.002;player.pitch-=mouseDZ*0.002;player.pitch=Math.max(-Math.PI/2+0.01,Math.min(Math.PI/2-0.01,player.pitch));mouseDX=0;mouseDZ=0;
+  player.attackCooldown = Math.max(0, player.attackCooldown - dt);
 
-function spawnEnemies() {
-  var day = clock.dayNumber;
-  var numZ = 2 + day * 2;
-  var numS = Math.max(0, Math.floor(day * 1.5 - 1));
-  for (var i = 0; i < numZ; i++) {
-    var edge = Math.floor(Math.random() * 4);
-    var ex, ey;
-    if (edge === 0) { ex = 3 * TILE; ey = (3 + Math.random() * (MAP_H - 6)) * TILE; }
-    else if (edge === 1) { ex = (MAP_W - 3) * TILE; ey = (3 + Math.random() * (MAP_H - 6)) * TILE; }
-    else if (edge === 2) { ex = (3 + Math.random() * (MAP_W - 6)) * TILE; ey = 3 * TILE; }
-    else { ex = (3 + Math.random() * (MAP_W - 6)) * TILE; ey = (MAP_H - 3) * TILE; }
-    zombies.push({ x: ex, y: ey, speed: 30, hp: 5, maxHp: 5, hurtTimer: 0, attackTimer: 0 });
-  }
-  for (var j = 0; j < numS; j++) {
-    var se = Math.floor(Math.random() * 4);
-    var sx, sy;
-    if (se === 0) { sx = 3 * TILE; sy = (3 + Math.random() * (MAP_H - 6)) * TILE; }
-    else if (se === 1) { sx = (MAP_W - 3) * TILE; sy = (3 + Math.random() * (MAP_H - 6)) * TILE; }
-    else if (se === 2) { sx = (3 + Math.random() * (MAP_W - 6)) * TILE; sy = 3 * TILE; }
-    else { sx = (3 + Math.random() * (MAP_W - 6)) * TILE; sy = (MAP_H - 3) * TILE; }
-    skeletons.push({ x: sx, y: sy, speed: 20, hp: 5, maxHp: 5, hurtTimer: 0, shootTimer: 2.5 });
-  }
-}
-
-function assignHouses() {
-  var houses = [];
-  for (var i = 0; i < buildings.length; i++) {
-    if (buildings[i].type === BTYPE.HOUSE) houses.push(buildings[i]);
-  }
-  var hIdx = 0;
-  for (var vi = 0; vi < villagers.length; vi++) {
-    if (villagers[vi].hp <= 0) continue;
-    villagers[vi].assignedHouse = hIdx < houses.length ? houses[hIdx++] : null;
-  }
-}
-
-function attackWallAt(px, py, dt) {
-  var atx = Math.floor(px / TILE);
-  var aty = Math.floor(py / TILE);
-  for (var i = 0; i < buildings.length; i++) {
-    var b = buildings[i];
-    if (b.type !== BTYPE.WALL && b.type !== BTYPE.GATE) continue;
-    if (atx >= b.x && atx < b.x + b.w && aty >= b.y && aty < b.y + b.h) {
-      b.hp -= 2 * dt;
-      if (b.hp <= 0) {
-        buildings.splice(i, 1);
-        rebuildWalkable();
-      }
-      break;
-    }
-  }
-}
-
-var enemiesSpawnedThisNight = false;
-var treesRespawnedThisDawn = false;
-
-function update(dt) {
-  if (gameOver) return;
-  gameTime += dt;
-
-  var pdx = 0, pdy = 0;
-  if (!player.dead) {
-    if (keys['KeyW'] || keys['ArrowUp']) pdy = -1;
-    if (keys['KeyS'] || keys['ArrowDown']) pdy = 1;
-    if (keys['KeyA'] || keys['ArrowLeft']) pdx = -1;
-    if (keys['KeyD'] || keys['ArrowRight']) pdx = 1;
-    if (pdx && pdy) { pdx *= 0.707; pdy *= 0.707; }
-  }
-
-  player.moving = (pdx !== 0 || pdy !== 0);
-  if (player.moving) player.walkTimer += dt * 8;
-  else player.walkTimer = 0;
-
-  if (!player.dead) {
-    var newX = player.x + pdx * player.speed * dt;
-    var newY = player.y + pdy * player.speed * dt;
-    if (canMoveTo(newX, player.y, player.size, false)) player.x = newX;
-    if (canMoveTo(player.x, newY, player.size, false)) player.y = newY;
-    player.x = Math.max(TILE * 2 + player.size, Math.min(WORLD_W - TILE * 2 - player.size, player.x));
-    player.y = Math.max(TILE * 2 + player.size, Math.min(WORLD_H - TILE * 2 - player.size, player.y));
-    // Push player out if stuck inside a non-walkable tile
-    if (!canMoveTo(player.x, player.y, player.size, false)) {
-      var stuckTX = Math.floor(player.x / TILE);
-      var stuckTY = Math.floor(player.y / TILE);
-      // Try pushing in each direction to find a free tile
-      var pushDirs = [[1,0],[-1,0],[0,1],[0,-1]];
-      for (var pi = 0; pi < pushDirs.length; pi++) {
-        var tryX = (stuckTX + pushDirs[pi][0]) * TILE + TILE/2;
-        var tryY = (stuckTY + pushDirs[pi][1]) * TILE + TILE/2;
-        if (canMoveTo(tryX, tryY, player.size, false)) {
-          player.x = tryX; player.y = tryY; break;
-        }
-      }
-    }
-    player.regenTimer += dt;
-    if (player.regenTimer >= 5 && player.hp < player.maxHp) {
-      player.hp = Math.min(player.maxHp, player.hp + 1);
-      player.regenTimer = 0;
-    }
-  } else {
+  // Player death and respawn
+  if (player.dead) {
     player.respawnTimer -= dt;
     if (player.respawnTimer <= 0) {
       player.dead = false;
       player.hp = player.maxHp;
-      player.x = cx * TILE + TILE / 2;
-      player.y = cy * TILE + TILE / 2;
+      player.pos.set(0.5, GROUND_LEVEL + 1 + 1.62, 0.5);
     }
   }
 
-  var villageCenterX = cx * TILE + TILE / 2;
-  var villageCenterY = cy * TILE + TILE / 2;
-  var maxWanderDist = 10 * TILE;
+  if(!player.dead){
+  const sprint=keys['ShiftLeft']||keys['ShiftRight'],speed=sprint?7.5:5.2;
+  const fwd=new THREE.Vector3(-Math.sin(player.yaw),0,-Math.cos(player.yaw)),rt=new THREE.Vector3(Math.cos(player.yaw),0,-Math.sin(player.yaw)),mv=new THREE.Vector3();
+  if(keys['KeyW'])mv.add(fwd);if(keys['KeyS'])mv.sub(fwd);if(keys['KeyA'])mv.sub(rt);if(keys['KeyD'])mv.add(rt);if(mv.length()>0)mv.normalize();
+  player.vel.x=mv.x*speed*dt;player.vel.z=mv.z*speed*dt;player.vel.y-=25*dt*dt;
+  if(keys['Space']&&player.onGround){player.vel.y=0.15;player.onGround=false;}player.vel.y=Math.max(player.vel.y,-1);player.onGround=false;
+  collideAxis(player.pos,player.vel,'x');collideAxis(player.pos,player.vel,'y');collideAxis(player.pos,player.vel,'z');
+  // Player footstep sounds
+  const isMoving=mv.length()>0&&player.onGround;
+  if(isMoving){playerStepTimer+=dt*(sprint?1.0:0.7);if(playerStepTimer>=0.6){playerStepTimer=0;playFootstep(getFootstepType(Math.floor(player.pos.x),Math.floor(player.pos.z)));spawnParticles(player.pos.x, 2.1, player.pos.z, 0x999966, 2, 0.5);}}else{playerStepTimer=0.4;}
+  } // end if(!player.dead)
 
-  for (var uvi = 0; uvi < villagers.length; uvi++) {
-    var v = villagers[uvi];
-    if (v.hp <= 0) continue;
-    v.statusTimer = Math.max(0, v.statusTimer - dt);
+  camera.position.copy(player.pos);camera.rotation.order='YXZ';camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
 
-    if (clock.phase === 'night' && v.isWarrior && (v.state === 'IDLE' || v.state === 'FIGHT') && !v.sleeping) {
-      // Warriors flee if HP is less than half
-      if (v.hp <= Math.floor(v.maxHp / 2)) {
-        if (v.state === 'FIGHT') { v.state = 'IDLE'; v.fightTarget = null; }
-        // Flee behavior handled below with other villagers
-      } else if (v.state === 'IDLE') {
-        var nearestEnemy = null, nearestEnemyDist = Infinity;
-        for (var wzi = 0; wzi < zombies.length; wzi++) {
-          if (zombies[wzi].hp <= 0) continue;
-          var wzdx = zombies[wzi].x - v.x, wzdy = zombies[wzi].y - v.y;
-          var wzd = Math.sqrt(wzdx * wzdx + wzdy * wzdy);
-          if (wzd < nearestEnemyDist) { nearestEnemyDist = wzd; nearestEnemy = zombies[wzi]; }
-        }
-        for (var wsi = 0; wsi < skeletons.length; wsi++) {
-          if (skeletons[wsi].hp <= 0) continue;
-          var wsdx = skeletons[wsi].x - v.x, wsdy = skeletons[wsi].y - v.y;
-          var wsd = Math.sqrt(wsdx * wsdx + wsdy * wsdy);
-          if (wsd < nearestEnemyDist) { nearestEnemyDist = wsd; nearestEnemy = skeletons[wsi]; }
-        }
-        if (nearestEnemy) {
-          v.state = 'FIGHT'; v.fightTarget = nearestEnemy; v.fightTimer = 0;
-        }
-      }
-    }
-    if (clock.phase === 'night' && v.state === 'IDLE' && !v.sleeping) {
-      if (v.assignedHouse) {
-        v.state = 'TRAVEL'; v.task = 'sleep';
-        v.targetX = v.assignedHouse.x * TILE + TILE;
-        v.targetY = v.assignedHouse.y * TILE + TILE;
-      }
-    }
-    if (clock.phase === 'day' && v.sleeping) {
-      v.sleeping = false; v.state = 'IDLE'; v.wanderTimer = 1;
-    }
-    if (v.sleeping) continue;
-
-    // Villagers flee from nearby monsters at night (non-warriors always, warriors when low HP)
-    var shouldFlee = !v.isWarrior || (v.isWarrior && v.hp <= Math.floor(v.maxHp / 2));
-    if (v.state === 'IDLE' && clock.phase === 'night' && shouldFlee) {
-      var fleeX = 0, fleeY = 0, fleeing = false;
-      var fleeRange = 5 * TILE;
-      for (var fzi = 0; fzi < zombies.length; fzi++) {
-        var fz = zombies[fzi];
-        if (fz.hp <= 0) continue;
-        var fdx = v.x - fz.x, fdy = v.y - fz.y;
-        var fd = Math.sqrt(fdx*fdx + fdy*fdy);
-        if (fd < fleeRange && fd > 0) { fleeX += fdx/fd; fleeY += fdy/fd; fleeing = true; }
-      }
-      for (var fsi = 0; fsi < skeletons.length; fsi++) {
-        var fs = skeletons[fsi];
-        if (fs.hp <= 0) continue;
-        var fsdx = v.x - fs.x, fsdy = v.y - fs.y;
-        var fsd = Math.sqrt(fsdx*fsdx + fsdy*fsdy);
-        if (fsd < fleeRange && fsd > 0) { fleeX += fsdx/fsd; fleeY += fsdy/fsd; fleeing = true; }
-      }
-      if (fleeing) {
-        var flen = Math.sqrt(fleeX*fleeX + fleeY*fleeY);
-        if (flen > 0) {
-          var fmx = (fleeX/flen) * v.speed * 2 * dt;
-          var fmy = (fleeY/flen) * v.speed * 2 * dt;
-          if (canMoveTo(v.x + fmx, v.y, 10, false)) v.x += fmx;
-          if (canMoveTo(v.x, v.y + fmy, 10, false)) v.y += fmy;
-          v.moving = true; v.walkTimer += dt * 10;
-          v.statusText = 'Fleeing!'; v.statusTimer = 0.3;
-        }
-      }
-    }
-
-    if (v.state === 'IDLE') {
-      v.wanderTimer -= dt;
-      if (v.wanderTimer <= 0) {
-        v.wanderTimer = 2 + Math.random() * 3;
-        var dvx = v.x - villageCenterX;
-        var dvy = v.y - villageCenterY;
-        var dv = Math.sqrt(dvx * dvx + dvy * dvy);
-        if (dv > maxWanderDist * 0.7) {
-          var ang = Math.atan2(-dvy, -dvx) + (Math.random() - 0.5) * 1.5;
-          v.wanderDx = Math.cos(ang); v.wanderDy = Math.sin(ang);
-        } else {
-          var ang2 = Math.random() * Math.PI * 2;
-          v.wanderDx = Math.cos(ang2); v.wanderDy = Math.sin(ang2);
-        }
-      }
-      var vvx = v.x + v.wanderDx * v.speed * dt;
-      var vvy = v.y + v.wanderDy * v.speed * dt;
-      v.moving = true; v.walkTimer += dt * 6;
-      if (canMoveTo(vvx, v.y, 10, false)) v.x = vvx;
-      if (canMoveTo(v.x, vvy, 10, false)) v.y = vvy;
-      // Gently pull toward village center instead of teleporting
-      var vDistX = v.x - villageCenterX;
-      var vDistY = v.y - villageCenterY;
-      var vDist = Math.sqrt(vDistX * vDistX + vDistY * vDistY);
-      if (vDist > maxWanderDist) {
-        var pullX = -(vDistX / vDist) * v.speed * dt;
-        var pullY = -(vDistY / vDist) * v.speed * dt;
-        if (canMoveTo(v.x + pullX, v.y, 10, false)) v.x += pullX;
-        if (canMoveTo(v.x, v.y + pullY, 10, false)) v.y += pullY;
-        v.wanderTimer = 0;
-      }
-      v.x = Math.max(TILE * 3, Math.min(WORLD_W - TILE * 3, v.x));
-      v.y = Math.max(TILE * 3, Math.min(WORLD_H - TILE * 3, v.y));
-    } else if (v.state === 'TRAVEL') {
-      var tdx = v.targetX - v.x;
-      var tdy = v.targetY - v.y;
-      var tdist = Math.sqrt(tdx * tdx + tdy * tdy);
-      v.moving = true; v.walkTimer += dt * 6;
-      if (tdist < 26) {
-        if (v.task === 'gather' || v.task === 'gather_farm') {
-          v.state = 'GATHER'; v.gatherTimer = 2; v.moving = false;
-        } else if (v.task === 'build') {
-          v.state = 'BUILD'; v.buildTimer = 3; v.moving = false;
-        } else if (v.task === 'sleep') {
-          v.sleeping = true; v.state = 'SLEEP'; v.moving = false;
-        }
-        v.stuckTimer = 0; v.lastDistToTarget = 9999;
-      } else {
-        var spd = v.speed * 1.5;
-        var mx = (tdx / tdist) * spd * dt;
-        var my = (tdy / tdist) * spd * dt;
-        var movedX = canMoveTo(v.x + mx, v.y, 10, false);
-        var movedY = canMoveTo(v.x, v.y + my, 10, false);
-        if (movedX) v.x += mx;
-        if (movedY) v.y += my;
-        // If blocked on one axis, try sliding perpendicular to get around obstacle
-        if (!movedX && movedY) {
-          // Try nudging X in alternate direction
-          var slideX = (tdy > 0 ? 1 : -1) * spd * dt;
-          if (canMoveTo(v.x + slideX, v.y, 10, false)) v.x += slideX;
-          else if (canMoveTo(v.x - slideX, v.y, 10, false)) v.x -= slideX;
-        }
-        if (!movedY && movedX) {
-          var slideY = (tdx > 0 ? -1 : 1) * spd * dt;
-          if (canMoveTo(v.x, v.y + slideY, 10, false)) v.y += slideY;
-          else if (canMoveTo(v.x, v.y - slideY, 10, false)) v.y -= slideY;
-        }
-        // Track if we're making progress toward target
-        if (tdist < v.lastDistToTarget - 2) {
-          v.lastDistToTarget = tdist;
-          v.stuckTimer = 0;
-        } else {
-          v.stuckTimer += dt;
-        }
-        // Give up if stuck for 3 seconds or completely blocked
-        if (v.stuckTimer > 3 || (!movedX && !movedY)) {
-          v.state = 'IDLE'; v.task = null; v.gatherTarget = null;
-          v.buildTarget = null; v.wanderTimer = 1;
-          v.stuckTimer = 0; v.lastDistToTarget = 9999;
-          v.statusText = 'Can\'t reach!'; v.statusTimer = 1.5;
-        }
-      }
-    } else if (v.state === 'GATHER') {
-      v.gatherTimer -= dt;
-      v.statusText = 'Gathering'; v.statusTimer = 0.5;
-      if (v.gatherTimer <= 0) {
-        if (v.task === 'gather_farm') {
-          stockpile.wood += 2;
-          v.statusText = '+2 wood'; v.statusTimer = 1.5;
-        } else if (v.gatherTarget) {
-          var gt = v.gatherTarget;
-          if (gt.type === 'stone') {
-            stockpile.stone += 2;
-            v.statusText = '+2 stone'; v.statusTimer = 1.5;
-          } else {
-            stockpile.wood += 2;
-            v.statusText = '+2 wood'; v.statusTimer = 1.5;
-          }
-          gt.amount -= 1;
-          if (gt.amount <= 0) {
-            var didx = deposits.indexOf(gt);
-            if (didx >= 0) deposits.splice(didx, 1);
-            rebuildWalkable();
-          }
-        }
-        v.gatherTarget = null; v.task = null;
-        v.state = 'IDLE'; v.wanderTimer = 1;
-      }
-    } else if (v.state === 'BUILD') {
-      v.buildTimer -= dt;
-      v.statusText = 'Building'; v.statusTimer = 0.5;
-      if (v.buildTimer <= 0) {
-        if (v.buildTarget) {
-          v.buildTarget.built = true;
-          v.buildTarget.buildProgress = 1;
-          v.statusText = 'Done!'; v.statusTimer = 1.5;
-        }
-        v.buildTarget = null; v.task = null;
-        v.state = 'IDLE'; v.wanderTimer = 1;
-      }
-    } else if (v.state === 'FIGHT') {
-      if (!v.fightTarget || v.fightTarget.hp <= 0) {
-        v.fightTarget = null;
-        v.state = 'IDLE'; v.wanderTimer = 1; v.moving = false;
-      } else {
-        var ftdx = v.fightTarget.x - v.x, ftdy = v.fightTarget.y - v.y;
-        var ftd = Math.sqrt(ftdx * ftdx + ftdy * ftdy);
-        var fightRange = 20;
-        if (ftd > fightRange) {
-          var fspd = v.speed * 2;
-          var fmx = (ftdx / ftd) * fspd * dt, fmy = (ftdy / ftd) * fspd * dt;
-          if (canMoveTo(v.x + fmx, v.y, 10, false)) v.x += fmx;
-          if (canMoveTo(v.x, v.y + fmy, 10, false)) v.y += fmy;
-          v.moving = true; v.walkTimer += dt * 6;
-        } else {
-          v.moving = false;
-          v.fightTimer -= dt;
-          if (v.fightTimer <= 0) {
-            v.fightTimer = 1;
-            v.fightTarget.hp -= 2;
-            if (v.fightTarget.hurtTimer !== undefined) v.fightTarget.hurtTimer = 0.2;
-            v.statusText = 'Attack!'; v.statusTimer = 0.4;
-          }
-        }
-        if (clock.phase === 'day') {
-          v.fightTarget = null; v.state = 'IDLE'; v.wanderTimer = 1; v.moving = false;
-        }
-      }
-    }
-    if (menuVillager && menuVillager.hp <= 0) closeVillagerMenu();
-    // Push villager out if stuck inside non-walkable tile
-    if (!canMoveTo(v.x, v.y, 6, false)) {
-      var svtx = Math.floor(v.x / TILE), svty = Math.floor(v.y / TILE);
-      var pushDirs = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]];
-      for (var pdi = 0; pdi < pushDirs.length; pdi++) {
-        var tryVX = (svtx + pushDirs[pdi][0]) * TILE + TILE/2;
-        var tryVY = (svty + pushDirs[pdi][1]) * TILE + TILE/2;
-        if (canMoveTo(tryVX, tryVY, 6, false)) {
-          v.x = tryVX; v.y = tryVY; break;
-        }
-      }
-    }
+  // Screen shake
+  if (screenShake > 0) {
+    screenShake -= dt;
+    const intensity = screenShake * 0.15;
+    camera.position.x += (Math.random() - 0.5) * intensity;
+    camera.position.y += (Math.random() - 0.5) * intensity;
+    camera.position.z += (Math.random() - 0.5) * intensity;
   }
 
-  clock.timeLeft -= dt;
-
-  if (clock.phase === 'day' && clock.timeLeft <= 5 && !enemiesSpawnedThisNight) {
-    enemiesSpawnedThisNight = true;
-    spawnEnemies();
-    assignHouses();
+  // Player damage flash overlay
+  if (player.damageFlash > 0) {
+    player.damageFlash -= dt;
+    document.getElementById('damage-overlay').style.display = 'block';
+  } else {
+    document.getElementById('damage-overlay').style.display = 'none';
   }
 
-  if (clock.timeLeft <= 0) {
-    if (clock.phase === 'day') {
-      clock.phase = 'night'; clock.timeLeft = NIGHT_LENGTH;
+  // Update day/night cycle
+  updateDayNight(dt);
+  updateVillagers(dt);
+  updateZombies(dt);
+
+  // Check game over
+  let aliveVillagers = 0;
+  for (const v of villagers) { if (v.hp > 0) aliveVillagers++; }
+  if (aliveVillagers === 0 && !gameOver) {
+    gameOver = true;
+  }
+
+  if(rightClick){
+    const dir=new THREE.Vector3(0,0,-1).applyEuler(camera.rotation);
+    const hit=raycast(camera.position,dir,5);
+    if(hit&&hit.block===BLOCK.DOOR){
+      const k2=`${hit.x},2,${hit.z}`,k3=`${hit.x},3,${hit.z}`;
+      const d2=doorData.get(k2),d3=doorData.get(k3);
+      const ns=d2?!d2.open:true;if(d2)d2.open=ns;if(d3)d3.open=ns;markDirtyAt(hit.x,hit.z);
+    } else if (hit && (hit.block===BLOCK.PLANKS||hit.block===BLOCK.WOOD)) {
+      // Check if this block is part of a player-built structure
+      let foundBuild = -1;
+      for (let bi = 0; bi < buildSites.length; bi++) {
+        const bs = buildSites[bi];
+        if (!bs.built) continue;
+        if (bs.type === 'treefarm') {
+          if (hit.x >= bs.x && hit.x <= bs.x+4 && hit.z >= bs.z && hit.z <= bs.z+4) { foundBuild = bi; break; }
+        } else {
+          // Wall/gate: check if within 6 blocks of origin
+          if (bs.rotation === 0 && hit.x >= bs.x && hit.x <= bs.x+5 && hit.z === bs.z && hit.y >= 2 && hit.y <= 7) { foundBuild = bi; break; }
+          if (bs.rotation === 1 && hit.z >= bs.z && hit.z <= bs.z+5 && hit.x === bs.x && hit.y >= 2 && hit.y <= 7) { foundBuild = bi; break; }
+        }
+      }
+      if (foundBuild >= 0) {
+        const bs = buildSites[foundBuild];
+        // Remove all blocks
+        if (bs.type === 'treefarm') {
+          for (let dx=0;dx<5;dx++){for(let dz=0;dz<5;dz++){
+            setBlock(bs.x+dx,2,bs.z+dz,BLOCK.GRASS);
+            for(let y=3;y<10;y++){const b=getBlock(bs.x+dx,y,bs.z+dz);if(b===BLOCK.WOOD||b===BLOCK.LEAVES)setBlock(bs.x+dx,y,bs.z+dz,BLOCK.AIR);}
+          }}
+          inventory.wood += 7; // partial refund
+        } else {
+          const refund = bs.type==='gate' ? 3 : 4;
+          if (bs.rotation === 0) { for(let dx=0;dx<6;dx++){for(let dy=2;dy<8;dy++){setBlock(bs.x+dx,dy,bs.z,BLOCK.AIR);doorData.delete(`${bs.x+dx},${dy},${bs.z}`);}}}
+          else { for(let dz=0;dz<6;dz++){for(let dy=2;dy<8;dy++){setBlock(bs.x,dy,bs.z+dz,BLOCK.AIR);doorData.delete(`${bs.x},${dy},${bs.z+dz}`);}}}
+          inventory.wood += refund;
+        }
+        if(bs.ghostMesh){scene.remove(bs.ghostMesh);}if(bs.ghostWire){scene.remove(bs.ghostWire);}
+        buildSites.splice(foundBuild, 1);
+        spawnParticles(hit.x+0.5, hit.y+0.5, hit.z+0.5, 0xb89858, 12, 3);
+      }
     } else {
-      clock.phase = 'day'; clock.timeLeft = DAY_LENGTH;
-      clock.dayNumber++;
-      enemiesSpawnedThisNight = false;
-      treesRespawnedThisDawn = false;
-      for (var wi = 0; wi < villagers.length; wi++) {
-        if (villagers[wi].sleeping) {
-          villagers[wi].sleeping = false;
-          villagers[wi].state = 'IDLE';
-          villagers[wi].wanderTimer = 1;
-        }
-      }
-    }
-  }
-
-  if (clock.phase === 'day' && !treesRespawnedThisDawn && clock.timeLeft > DAY_LENGTH - 5) {
-    treesRespawnedThisDawn = true;
-    var added = 0;
-    for (var attempt = 0; attempt < 50 && added < 3; attempt++) {
-      var rx = Math.floor(Math.random() * (MAP_W - 6)) + 3;
-      var ry = Math.floor(Math.random() * (MAP_H - 6)) + 3;
-      if (Math.abs(rx - cx) + Math.abs(ry - cy) < 8) continue;
-      if (!walkable[ry][rx]) continue;
-      deposits.push({ type: 'wood', x: rx, y: ry, amount: 1 });
-      rebuildWalkable();
-      added++;
-    }
-  }
-
-  for (var uzi = 0; uzi < zombies.length; uzi++) {
-    var z = zombies[uzi];
-    if (z.hp <= 0) continue;
-    z.hurtTimer = Math.max(0, z.hurtTimer - dt);
-    z.attackTimer = Math.max(0, z.attackTimer - dt);
-    var ztX = null, ztY = null, ztD = Infinity;
-    if (!player.dead) {
-      ztX = player.x; ztY = player.y;
-      ztD = Math.sqrt((z.x - player.x) * (z.x - player.x) + (z.y - player.y) * (z.y - player.y));
-    }
-    for (var zvi = 0; zvi < villagers.length; zvi++) {
-      var zv = villagers[zvi];
-      if (zv.hp <= 0 || zv.sleeping) continue;
-      var zvd = Math.sqrt((z.x - zv.x) * (z.x - zv.x) + (z.y - zv.y) * (z.y - zv.y));
-      if (zvd < ztD) { ztD = zvd; ztX = zv.x; ztY = zv.y; }
-    }
-    if (ztX !== null) {
-      var zdx2 = ztX - z.x, zdy2 = ztY - z.y;
-      var zd2 = Math.sqrt(zdx2 * zdx2 + zdy2 * zdy2);
-      if (zd2 > 12) {
-        var zmx = (zdx2 / zd2) * z.speed * dt;
-        var zmy = (zdy2 / zd2) * z.speed * dt;
-        if (canMoveTo(z.x + zmx, z.y, 10, true)) z.x += zmx;
-        else attackWallAt(z.x + zmx, z.y, dt);
-        if (canMoveTo(z.x, z.y + zmy, 10, true)) z.y += zmy;
-        else attackWallAt(z.x, z.y + zmy, dt);
-      }
-      if (zd2 < 18 && z.attackTimer <= 0) {
-        z.attackTimer = 1;
-        if (!player.dead) {
-          var pd = Math.sqrt((z.x - player.x) * (z.x - player.x) + (z.y - player.y) * (z.y - player.y));
-          if (pd < 20) {
-            player.hp--; player.regenTimer = 0;
-            if (player.hp <= 0) { player.dead = true; player.respawnTimer = 3; }
-          }
-        }
-        for (var zvi2 = 0; zvi2 < villagers.length; zvi2++) {
-          var zv2 = villagers[zvi2];
-          if (zv2.hp <= 0 || zv2.sleeping) continue;
-          if (Math.sqrt((z.x - zv2.x) * (z.x - zv2.x) + (z.y - zv2.y) * (z.y - zv2.y)) < 20) {
-            zv2.hp--;
-            if (zv2.hp <= 0) { zv2.statusText = 'Dead'; zv2.statusTimer = 3; }
+      // Check if looking at a villager
+      const lookDir = new THREE.Vector3(0,0,-1).applyEuler(camera.rotation);
+      for (const v of villagers) {
+        const vPos = new THREE.Vector3(v.x, 2.7, v.z);
+        const toV = vPos.clone().sub(camera.position);
+        const along = toV.dot(lookDir);
+        if (along > 0 && along < 6) {
+          const perp = toV.clone().sub(lookDir.clone().multiplyScalar(along));
+          if (perp.length() < 1) {
+            // Open villager menu
+            menuVillager = v;
+            document.getElementById('villager-menu').style.display = 'block';
+            document.exitPointerLock();
+            break;
           }
         }
       }
     }
+    rightClick=false;
   }
-
-  for (var usi = 0; usi < skeletons.length; usi++) {
-    var sk = skeletons[usi];
-    if (sk.hp <= 0) continue;
-    sk.hurtTimer = Math.max(0, sk.hurtTimer - dt);
-    sk.shootTimer -= dt;
-    var stX = null, stY = null, stD = Infinity;
-    if (!player.dead) {
-      stX = player.x; stY = player.y;
-      stD = Math.sqrt((sk.x - player.x) * (sk.x - player.x) + (sk.y - player.y) * (sk.y - player.y));
-    }
-    for (var svi = 0; svi < villagers.length; svi++) {
-      var sv = villagers[svi];
-      if (sv.hp <= 0 || sv.sleeping) continue;
-      var svd = Math.sqrt((sk.x - sv.x) * (sk.x - sv.x) + (sk.y - sv.y) * (sk.y - sv.y));
-      if (svd < stD) { stD = svd; stX = sv.x; stY = sv.y; }
-    }
-    if (stX !== null) {
-      var skdx2 = stX - sk.x, skdy2 = stY - sk.y;
-      var skd2 = Math.sqrt(skdx2 * skdx2 + skdy2 * skdy2);
-      if (skd2 > 6 * TILE) {
-        var smx = (skdx2 / skd2) * sk.speed * dt;
-        var smy = (skdy2 / skd2) * sk.speed * dt;
-        if (canMoveTo(sk.x + smx, sk.y, 10, true)) sk.x += smx;
-        if (canMoveTo(sk.x, sk.y + smy, 10, true)) sk.y += smy;
-      } else if (skd2 < 4 * TILE) {
-        var smx2 = (-skdx2 / skd2) * sk.speed * dt;
-        var smy2 = (-skdy2 / skd2) * sk.speed * dt;
-        if (canMoveTo(sk.x + smx2, sk.y, 10, true)) sk.x += smx2;
-        if (canMoveTo(sk.x, sk.y + smy2, 10, true)) sk.y += smy2;
-      }
-      if (sk.shootTimer <= 0 && skd2 < 8 * TILE && skd2 > 0) {
-        sk.shootTimer = 2.5;
-        var adx = stX - sk.x, ady = stY - sk.y;
-        var ad = Math.sqrt(adx * adx + ady * ady);
-        arrows.push({ x: sk.x, y: sk.y, vx: (adx / ad) * 120, vy: (ady / ad) * 120, life: 2 });
-      }
-    }
-  }
-
-  for (var uai = 0; uai < arrows.length; uai++) {
-    var a = arrows[uai];
-    a.x += a.vx * dt; a.y += a.vy * dt; a.life -= dt;
-    if (!player.dead) {
-      if (Math.sqrt((a.x - player.x) * (a.x - player.x) + (a.y - player.y) * (a.y - player.y)) < 10) {
-        player.hp--; player.regenTimer = 0; a.life = 0;
-        if (player.hp <= 0) { player.dead = true; player.respawnTimer = 3; }
-      }
-    }
-    for (var avi = 0; avi < villagers.length; avi++) {
-      var av = villagers[avi];
-      if (av.hp <= 0 || av.sleeping) continue;
-      if (Math.sqrt((a.x - av.x) * (a.x - av.x) + (a.y - av.y) * (a.y - av.y)) < 10) {
-        av.hp--; a.life = 0;
-        if (av.hp <= 0) { av.statusText = 'Dead'; av.statusTimer = 3; }
-        break;
-      }
-    }
-  }
-
-  for (var rzi = zombies.length - 1; rzi >= 0; rzi--) {
-    if (zombies[rzi].hp <= 0) zombies.splice(rzi, 1);
-  }
-  for (var rsi = skeletons.length - 1; rsi >= 0; rsi--) {
-    if (skeletons[rsi].hp <= 0) skeletons.splice(rsi, 1);
-  }
-  for (var rai = arrows.length - 1; rai >= 0; rai--) {
-    if (arrows[rai].life <= 0) arrows.splice(rai, 1);
-  }
-
-  var aliveCount = 0;
-  for (var goi = 0; goi < villagers.length; goi++) {
-    if (villagers[goi].hp > 0) aliveCount++;
-  }
-  if (aliveCount === 0) gameOver = true;
-  if (selectedVillager && selectedVillager.hp <= 0) selectedVillager = null;
-  updateCamera();
-}
-
-var tileCache = {};
-function getTileCanvas(type, tx, ty) {
-  var key = type + ',' + tx + ',' + ty;
-  if (tileCache[key]) return tileCache[key];
-  var c = document.createElement('canvas');
-  c.width = TILE; c.height = TILE;
-  var tc = c.getContext('2d');
-  var rng = seededRand(tx * 1000 + ty * 7 + type * 31);
-  if (type === T.GRASS) {
-    // Base mid-green
-    tc.fillStyle = '#4a8c28';
-    tc.fillRect(0, 0, TILE, TILE);
-    // Shade 2 — slightly lighter patches
-    tc.fillStyle = '#5aa030';
-    for (var i = 0; i < 8; i++) {
-      tc.fillRect((rng() * TILE) | 0, (rng() * TILE) | 0, (rng() * 5 + 2) | 0, (rng() * 4 + 2) | 0);
-    }
-    // Shade 3 — slightly darker patches
-    tc.fillStyle = '#3a7820';
-    for (var i = 0; i < 8; i++) {
-      tc.fillRect((rng() * TILE) | 0, (rng() * TILE) | 0, (rng() * 4 + 2) | 0, (rng() * 3 + 2) | 0);
-    }
-    // Tiny noise dots
-    for (var i = 0; i < 18; i++) {
-      var shade = ((rng() * 50 - 25) | 0);
-      tc.fillStyle = 'rgb(' + (74 + shade) + ',' + (140 + shade) + ',' + (40 + shade) + ')';
-      tc.fillRect((rng() * TILE) | 0, (rng() * TILE) | 0, 1, 1);
-    }
-    // Occasional dark tuft (1-2px)
-    tc.fillStyle = '#2a6010';
-    for (var i = 0; i < 4; i++) {
-      var tx2 = (rng() * (TILE - 2)) | 0, ty2 = (rng() * (TILE - 2)) | 0;
-      tc.fillRect(tx2, ty2, 1, 2);
-      tc.fillRect(tx2 + 1, ty2 + 1, 1, 1);
-    }
-  } else if (type === T.DIRT) {
-    // Base sandy-brown
-    tc.fillStyle = '#9b7020';
-    tc.fillRect(0, 0, TILE, TILE);
-    // Subtle color banding — footpath feel
-    for (var i = 0; i < 6; i++) {
-      var shade = ((rng() * 24 - 12) | 0);
-      tc.fillStyle = 'rgb(' + (155 + shade) + ',' + (112 + shade) + ',' + (32 + shade) + ')';
-      tc.fillRect((rng() * TILE) | 0, (rng() * TILE) | 0, (rng() * 10 + 4) | 0, (rng() * 3 + 2) | 0);
-    }
-    // Small pebble dots
-    for (var i = 0; i < 7; i++) {
-      var pv = 80 + ((rng() * 30) | 0);
-      tc.fillStyle = 'rgb(' + pv + ',' + (pv - 10) + ',' + (pv - 20) + ')';
-      tc.fillRect((rng() * (TILE - 2)) | 0, (rng() * (TILE - 2)) | 0, (rng() < 0.5 ? 2 : 1), (rng() < 0.5 ? 2 : 1));
-    }
-    // Highlight pebble sheen
-    tc.fillStyle = 'rgba(255,240,200,0.18)';
-    for (var i = 0; i < 5; i++) {
-      tc.fillRect((rng() * (TILE - 1)) | 0, (rng() * (TILE - 1)) | 0, 1, 1);
-    }
-  } else if (type === T.STONE_PATH) {
-    // Dark grout background
-    tc.fillStyle = '#555';
-    tc.fillRect(0, 0, TILE, TILE);
-    // Define 4 cobblestones in a 2x2 grid with gaps — each stone slightly different shade
-    var stones = [
-      { x: 1, y: 1, w: 13, h: 13 },
-      { x: 17, y: 1, w: 14, h: 13 },
-      { x: 1, y: 17, w: 13, h: 14 },
-      { x: 17, y: 17, w: 14, h: 14 }
-    ];
-    for (var si2 = 0; si2 < 4; si2++) {
-      var st = stones[si2];
-      var sv = 130 + ((rng() * 30 - 15) | 0);
-      // Stone body
-      tc.fillStyle = 'rgb(' + sv + ',' + sv + ',' + (sv - 8) + ')';
-      tc.fillRect(st.x, st.y, st.w, st.h);
-      // Top-left highlight
-      tc.fillStyle = 'rgba(255,255,255,0.22)';
-      tc.fillRect(st.x, st.y, st.w, 1);
-      tc.fillRect(st.x, st.y, 1, st.h);
-      // Bottom-right shadow
-      tc.fillStyle = 'rgba(0,0,0,0.28)';
-      tc.fillRect(st.x, st.y + st.h - 1, st.w, 1);
-      tc.fillRect(st.x + st.w - 1, st.y, 1, st.h);
-      // Subtle noise inside stone
-      for (var ni = 0; ni < 3; ni++) {
-        var nv = sv + ((rng() * 20 - 10) | 0);
-        tc.fillStyle = 'rgb(' + nv + ',' + nv + ',' + (nv - 8) + ')';
-        tc.fillRect((st.x + 1 + rng() * (st.w - 3)) | 0, (st.y + 1 + rng() * (st.h - 3)) | 0, 2, 1);
-      }
-    }
-  } else if (type === T.WATER) {
-    // Deep water base
-    tc.fillStyle = '#1a5590';
-    tc.fillRect(0, 0, TILE, TILE);
-    // Mid blue
-    tc.fillStyle = '#2266aa';
-    tc.fillRect(0, 0, TILE, TILE / 2 + 4);
-    // Light ripple bands — 3 shades
-    tc.fillStyle = '#3d85cc';
-    for (var i = 0; i < 3; i++) {
-      var wy2 = (rng() * (TILE - 4)) | 0;
-      var ww2 = (rng() * 14 + 6) | 0;
-      tc.fillRect((rng() * (TILE - ww2)) | 0, wy2, ww2, 2);
-    }
-    tc.fillStyle = '#5aabee';
-    for (var i = 0; i < 2; i++) {
-      var wy3 = (rng() * (TILE - 4)) | 0;
-      var ww3 = (rng() * 8 + 3) | 0;
-      tc.fillRect((rng() * (TILE - ww3)) | 0, wy3, ww3, 1);
-    }
-    // Bright specular highlight dots
-    tc.fillStyle = 'rgba(180,230,255,0.55)';
-    for (var i = 0; i < 4; i++) {
-      tc.fillRect((rng() * (TILE - 1)) | 0, (rng() * (TILE - 1)) | 0, 1, 1);
-    }
-  }
-  tileCache[key] = c;
-  return c;
-}
-
-function render() {
-  ctx.fillStyle = '#111';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.scale(ZOOM, ZOOM);
-  var viewW = canvas.width / ZOOM;
-  var viewH = canvas.height / ZOOM;
-  var startTX = Math.max(0, Math.floor(camera.x / TILE));
-  var startTY = Math.max(0, Math.floor(camera.y / TILE));
-  var endTX = Math.min(MAP_W - 1, Math.floor((camera.x + viewW) / TILE));
-  var endTY = Math.min(MAP_H - 1, Math.floor((camera.y + viewH) / TILE));
-
-  for (var rty = startTY; rty <= endTY; rty++) {
-    for (var rtx = startTX; rtx <= endTX; rtx++) {
-      ctx.drawImage(getTileCanvas(map[rty][rtx], rtx, rty), rtx * TILE - camera.x, rty * TILE - camera.y);
-    }
-  }
-
-  for (var rbi = 0; rbi < buildings.length; rbi++) {
-    var b = buildings[rbi];
-    var bsx = b.x * TILE - camera.x;
-    var bsy = b.y * TILE - camera.y;
-    var bsw = b.w * TILE;
-    var bsh = b.h * TILE;
-    if (bsx + bsw < -10 || bsy + bsh < -10 || bsx > viewW + 10 || bsy > viewH + 10) continue;
-    var isGhost = !b.built && b.type !== BTYPE.HOUSE;
-
-    if (b.type === BTYPE.HOUSE) {
-      // Cozy village cottage
-      var m = 4; // margin inset
-      // Cobblestone base (thin strip)
-      ctx.fillStyle = '#777';
-      ctx.fillRect(bsx+m, bsy+bsh-4, bsw-m*2, 4);
-      // Wood plank walls
-      ctx.fillStyle = '#b08540';
-      ctx.fillRect(bsx+m, bsy+8, bsw-m*2, bsh-12);
-      // Plank grain lines
-      ctx.fillStyle = '#997030';
-      for (var hpy = bsy+12; hpy < bsy+bsh-4; hpy += 5) {
-        ctx.fillRect(bsx+m+1, hpy, bsw-m*2-2, 1);
-      }
-      // Log frame corners
-      ctx.fillStyle = '#3d2b13';
-      ctx.fillRect(bsx+m-1, bsy+6, 3, bsh-6);
-      ctx.fillRect(bsx+bsw-m-2, bsy+6, 3, bsh-6);
-      // Peaked roof (triangle-ish, wider than walls)
-      ctx.fillStyle = '#884422';
-      ctx.fillRect(bsx, bsy+2, bsw, 8);
-      ctx.fillStyle = '#773318';
-      ctx.fillRect(bsx+4, bsy, bsw-8, 4);
-      ctx.fillStyle = '#994a28';
-      ctx.fillRect(bsx+8, bsy-1, bsw-16, 3);
-      // Roof ridge
-      ctx.fillStyle = '#663015';
-      ctx.fillRect(bsx+m, bsy+2, bsw-m*2, 1);
-      // Door (centered, small)
-      ctx.fillStyle = '#2a1808';
-      ctx.fillRect(bsx+bsw/2-3, bsy+bsh-14, 6, 10);
-      ctx.fillStyle = '#3a2818';
-      ctx.fillRect(bsx+bsw/2-2, bsy+bsh-13, 4, 4);
-      ctx.fillRect(bsx+bsw/2-2, bsy+bsh-8, 4, 3);
-      // Door handle
-      ctx.fillStyle = '#cc9933';
-      ctx.fillRect(bsx+bsw/2+1, bsy+bsh-9, 1, 1);
-      // Window (one on each side, small)
-      ctx.fillStyle = '#3d2b13';
-      ctx.fillRect(bsx+m+4, bsy+14, 8, 7);
-      ctx.fillRect(bsx+bsw-m-12, bsy+14, 8, 7);
-      ctx.fillStyle = '#88bbdd';
-      ctx.fillRect(bsx+m+5, bsy+15, 3, 2);
-      ctx.fillRect(bsx+m+9, bsy+15, 2, 2);
-      ctx.fillRect(bsx+m+5, bsy+18, 3, 2);
-      ctx.fillRect(bsx+m+9, bsy+18, 2, 2);
-      ctx.fillRect(bsx+bsw-m-11, bsy+15, 3, 2);
-      ctx.fillRect(bsx+bsw-m-7, bsy+15, 2, 2);
-      ctx.fillRect(bsx+bsw-m-11, bsy+18, 3, 2);
-      ctx.fillRect(bsx+bsw-m-7, bsy+18, 2, 2);
-      // Sleeping Zzz
-      for (var hsvi = 0; hsvi < villagers.length; hsvi++) {
-        if (villagers[hsvi].sleeping && villagers[hsvi].assignedHouse === b) {
-          var zt = gameTime * 2;
-          ctx.globalAlpha = 0.5 + Math.sin(zt) * 0.3;
-          ctx.fillStyle = '#aaf';
-          ctx.font = '7px monospace';
-          ctx.fillText('Zzz', bsx + bsw/2 - 6, bsy - 4 + Math.sin(zt * 0.5) * 2);
-          ctx.globalAlpha = 1;
-        }
-      }
-    } else if (b.type === BTYPE.WALL) {
-      if (isGhost) ctx.globalAlpha = 0.5;
-      ctx.fillStyle = '#6a4a2a';
-      var wPosts = 4;
-      var wPostW = Math.floor(bsw / wPosts);
-      for (var wpi = 0; wpi < wPosts; wpi++) {
-        var wpx = bsx + wpi * wPostW + 1;
-        ctx.fillRect(wpx, bsy + 4, wPostW - 2, bsh - 4);
-        ctx.fillRect(wpx + 1, bsy + 2, wPostW - 4, 4);
-        ctx.fillRect(wpx + 2, bsy, wPostW - 6, 4);
-      }
-      ctx.fillStyle = '#5a3a1a';
-      ctx.fillRect(bsx, bsy + bsh * 0.4, bsw, 2);
-      ctx.fillRect(bsx, bsy + bsh * 0.7, bsw, 2);
-      if (isGhost) ctx.globalAlpha = 1;
-      if (b.built && b.hp < b.maxHp) {
-        ctx.fillStyle = '#500';
-        ctx.fillRect(bsx, bsy - 4, bsw, 3);
-        ctx.fillStyle = '#0a0';
-        ctx.fillRect(bsx, bsy - 4, bsw * (b.hp / b.maxHp), 3);
-      }
-    } else if (b.type === BTYPE.GATE) {
-      if (isGhost) ctx.globalAlpha = 0.5;
-      ctx.fillStyle = '#6a4a2a';
-      ctx.fillRect(bsx, bsy + 2, 6, bsh - 2);
-      ctx.fillRect(bsx + bsw - 6, bsy + 2, 6, bsh - 2);
-      ctx.fillRect(bsx + 1, bsy, 4, 4);
-      ctx.fillRect(bsx + bsw - 5, bsy, 4, 4);
-      ctx.fillStyle = '#5a3a1a';
-      ctx.fillRect(bsx + 6, bsy + 2, bsw - 12, 3);
-      ctx.fillStyle = '#8a7a6a';
-      var gBarSp = (bsw - 12) / 4;
-      for (var gbi = 1; gbi <= 3; gbi++) {
-        ctx.fillRect(bsx + 6 + gbi * gBarSp, bsy + 5, 1, bsh - 8);
-      }
-      if (isGhost) ctx.globalAlpha = 1;
-      if (b.built && b.hp < b.maxHp) {
-        ctx.fillStyle = '#500';
-        ctx.fillRect(bsx, bsy - 4, bsw, 3);
-        ctx.fillStyle = '#0a0';
-        ctx.fillRect(bsx, bsy - 4, bsw * (b.hp / b.maxHp), 3);
-      }
-    } else if (b.type === BTYPE.TREE_FARM) {
-      if (isGhost) ctx.globalAlpha = 0.5;
-      ctx.fillStyle = '#5a4a2a';
-      ctx.fillRect(bsx, bsy, bsw, 2);
-      ctx.fillRect(bsx, bsy + bsh - 2, bsw, 2);
-      ctx.fillRect(bsx, bsy, 2, bsh);
-      ctx.fillRect(bsx + bsw - 2, bsy, 2, bsh);
-      ctx.fillRect(bsx, bsy, 3, 3);
-      ctx.fillRect(bsx + bsw - 3, bsy, 3, 3);
-      ctx.fillRect(bsx, bsy + bsh - 3, 3, 3);
-      ctx.fillRect(bsx + bsw - 3, bsy + bsh - 3, 3, 3);
-      if (b.built) {
-        ctx.fillStyle = '#5a3a1a';
-        ctx.fillRect(bsx + bsw / 2 - 2, bsy + bsh / 2, 4, bsh / 2 - 4);
-        ctx.fillStyle = '#2a6a15';
-        ctx.fillRect(bsx + 4, bsy + 4, bsw - 8, bsh / 2);
-        ctx.fillStyle = '#1a5a0a';
-        ctx.fillRect(bsx + 6, bsy + 6, bsw - 12, bsh / 2 - 4);
+  // Update placement ghost position
+  if(placingBuild){
+    const dir=new THREE.Vector3(0,0,-1).applyEuler(camera.rotation);
+    const hit=raycast(camera.position,dir,12);
+    if(hit){
+      placeGhost.visible=true;
+      if(placingBuild==='treefarm'){
+        placeGhost.scale.set(5,1,5);
+        placeGhost.position.set(hit.x+0.5,2.5,hit.z+0.5);
+        placeGhost.rotation.y=0;
       } else {
-        ctx.fillStyle = '#6a5020';
-        ctx.fillRect(bsx + 3, bsy + 3, bsw - 6, bsh - 6);
+        if(buildRotation===0){placeGhost.scale.set(6,6,1);placeGhost.rotation.y=0;}
+        else{placeGhost.scale.set(1,6,6);placeGhost.rotation.y=0;}
+        placeGhost.position.set(hit.x+0.5,5,hit.z+0.5);
       }
-      if (isGhost) ctx.globalAlpha = 1;
     }
-  }
+    else{placeGhost.visible=false;}
+  } else {placeGhost.visible=false;}
 
-  if (buildMode && buildType !== null && ghostTile) {
-    var gx = ghostTile.x * TILE - camera.x;
-    var gy = ghostTile.y * TILE - camera.y;
-    var canPlace = ghostTile.x >= 2 && ghostTile.y >= 2 && ghostTile.x < MAP_W - 2 && ghostTile.y < MAP_H - 2 && walkable[ghostTile.y] && walkable[ghostTile.y][ghostTile.x];
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = canPlace ? '#0f0' : '#f00';
-    ctx.fillRect(gx, gy, TILE, TILE);
-    ctx.globalAlpha = 1;
-  }
+  if(leftClick){
+    // Player attack zombies
+    if (!player.dead && player.attackCooldown <= 0) {
+      const dir = new THREE.Vector3(0,0,-1).applyEuler(camera.rotation);
+      for (const z of zombies) {
+        const toZ = new THREE.Vector3(z.x, 2.7, z.z).sub(camera.position);
+        const along = toZ.dot(dir);
+        if (along > 0 && along < 3) {
+          const perp = toZ.clone().sub(dir.clone().multiplyScalar(along));
+          if (perp.length() < 1.2) {
+            z.hp--;
+            z.showHealthTimer = 3;
+            player.attackCooldown = 0.5;
+            playHitSound(); // hit sound
+            leftClick = false;
+            break;
+          }
+        }
+      }
+    }
 
-  for (var rdi = 0; rdi < deposits.length; rdi++) {
-    var d = deposits[rdi];
-    var dsx = d.x * TILE - camera.x;
-    var dsy = d.y * TILE - camera.y;
-    if (dsx + TILE < -10 || dsy + TILE < -10 || dsx > viewW + 10 || dsy > viewH + 10) continue;
-    if (d.type === 'wood') {
-      // Ground shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.22)';
-      ctx.fillRect(dsx + 6, dsy + 26, 22, 6);
-      // Trunk — alternating bark stripes
-      ctx.fillStyle = '#6b4220';
-      ctx.fillRect(dsx + 13, dsy + 17, 7, 15);
-      ctx.fillStyle = '#7a4f28';
-      ctx.fillRect(dsx + 14, dsy + 17, 2, 15);
-      ctx.fillRect(dsx + 18, dsy + 17, 1, 15);
-      ctx.fillStyle = '#4a2e12';
-      ctx.fillRect(dsx + 13, dsy + 20, 1, 4);
-      ctx.fillRect(dsx + 19, dsy + 22, 1, 4);
-      // Canopy — bottom layer (widest, darkest, much darker than grass)
-      ctx.fillStyle = '#145008';
-      ctx.fillRect(dsx + 2, dsy + 12, 28, 10);
-      // Middle layer
-      ctx.fillStyle = '#1e6610';
-      ctx.fillRect(dsx + 4, dsy + 6, 24, 10);
-      // Top layer (narrowest, brighter)
-      ctx.fillStyle = '#287a18';
-      ctx.fillRect(dsx + 8, dsy + 1, 16, 9);
-      // Top-left highlights on each layer
-      ctx.fillStyle = '#3a9a28';
-      ctx.fillRect(dsx + 2, dsy + 12, 8, 2);
-      ctx.fillRect(dsx + 2, dsy + 12, 2, 6);
-      ctx.fillRect(dsx + 4, dsy + 6, 7, 2);
-      ctx.fillRect(dsx + 4, dsy + 6, 2, 5);
-      ctx.fillRect(dsx + 8, dsy + 1, 6, 2);
-      ctx.fillRect(dsx + 8, dsy + 1, 2, 4);
-      // Bottom-right shadows on each layer
-      ctx.fillStyle = '#144808';
-      ctx.fillRect(dsx + 20, dsy + 18, 10, 4);
-      ctx.fillRect(dsx + 26, dsy + 12, 4, 10);
-      ctx.fillRect(dsx + 22, dsy + 12, 6, 2);
-      ctx.fillRect(dsx + 26, dsy + 6, 2, 8);
-      ctx.fillRect(dsx + 20, dsy + 8, 8, 2);
-    } else if (d.type === 'stone') {
-      // Ground shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.2)';
-      ctx.fillRect(dsx + 3, dsy + 26, 26, 5);
-      // Large boulder body
-      ctx.fillStyle = '#7a7a7a';
-      ctx.fillRect(dsx + 4, dsy + 12, 20, 16);
-      // Small boulder offset
-      ctx.fillStyle = '#727272';
-      ctx.fillRect(dsx + 16, dsy + 8, 13, 14);
-      // Top face highlight (lighter) — gives 3D illusion
-      ctx.fillStyle = '#a0a0a0';
-      ctx.fillRect(dsx + 4, dsy + 12, 20, 4);
-      ctx.fillRect(dsx + 16, dsy + 8, 13, 4);
-      ctx.fillStyle = '#b8b8b8';
-      ctx.fillRect(dsx + 5, dsy + 12, 8, 2);
-      ctx.fillRect(dsx + 17, dsy + 8, 6, 2);
-      // Left face highlight
-      ctx.fillStyle = '#909090';
-      ctx.fillRect(dsx + 4, dsy + 12, 2, 16);
-      // Bottom/right shadow
-      ctx.fillStyle = '#555';
-      ctx.fillRect(dsx + 4, dsy + 25, 20, 3);
-      ctx.fillRect(dsx + 22, dsy + 12, 2, 16);
-      ctx.fillRect(dsx + 27, dsy + 8, 2, 14);
-      // Cracks
-      ctx.fillStyle = '#444';
-      ctx.fillRect(dsx + 9, dsy + 16, 5, 1);
-      ctx.fillRect(dsx + 13, dsy + 16, 1, 4);
-      ctx.fillRect(dsx + 20, dsy + 12, 3, 1);
-      ctx.fillRect(dsx + 22, dsy + 13, 1, 3);
-      // Tiny pebble
-      ctx.fillStyle = '#888';
-      ctx.fillRect(dsx + 6, dsy + 24, 3, 2);
-    } else if (d.type === 'iron') {
-      // Ground shadow
-      ctx.fillStyle = 'rgba(0,0,0,0.2)';
-      ctx.fillRect(dsx + 3, dsy + 26, 26, 5);
-      // Main boulder — blue-grey
-      ctx.fillStyle = '#6a6a7a';
-      ctx.fillRect(dsx + 4, dsy + 12, 20, 16);
-      // Small boulder offset
-      ctx.fillStyle = '#606070';
-      ctx.fillRect(dsx + 16, dsy + 8, 13, 14);
-      // Top highlight
-      ctx.fillStyle = '#8a8a9a';
-      ctx.fillRect(dsx + 4, dsy + 12, 20, 4);
-      ctx.fillRect(dsx + 16, dsy + 8, 13, 4);
-      ctx.fillStyle = '#9a9aaa';
-      ctx.fillRect(dsx + 5, dsy + 12, 7, 2);
-      ctx.fillRect(dsx + 17, dsy + 8, 5, 2);
-      // Left highlight
-      ctx.fillStyle = '#787888';
-      ctx.fillRect(dsx + 4, dsy + 12, 2, 16);
-      // Bottom/right shadow
-      ctx.fillStyle = '#444450';
-      ctx.fillRect(dsx + 4, dsy + 25, 20, 3);
-      ctx.fillRect(dsx + 22, dsy + 12, 2, 16);
-      ctx.fillRect(dsx + 27, dsy + 8, 2, 14);
-      // Orange-gold ore veins — embedded streaks
-      ctx.fillStyle = '#d4901c';
-      ctx.fillRect(dsx + 7, dsy + 15, 4, 2);
-      ctx.fillRect(dsx + 9, dsy + 17, 2, 3);
-      ctx.fillRect(dsx + 19, dsy + 11, 5, 2);
-      ctx.fillRect(dsx + 22, dsy + 16, 3, 2);
-      // Bright vein highlight
-      ctx.fillStyle = '#f0c040';
-      ctx.fillRect(dsx + 7, dsy + 15, 2, 1);
-      ctx.fillRect(dsx + 19, dsy + 11, 2, 1);
-      // Cracks
-      ctx.fillStyle = '#333340';
-      ctx.fillRect(dsx + 11, dsy + 19, 4, 1);
-      ctx.fillRect(dsx + 14, dsy + 14, 1, 4);
-      ctx.fillRect(dsx + 21, dsy + 13, 2, 1);
-    }
-  }
+    if(!leftClick){ /* already consumed by attack */ }
+    // Check if placing a build
+    else if (placingBuild === 'treefarm') {
+      const dir = new THREE.Vector3(0,0,-1).applyEuler(camera.rotation);
+      const hit = raycast(camera.position, dir, 12);
+      if (hit && hit.block !== BLOCK.AIR) {
+        const bx = hit.x - 2, bz = hit.z - 2;
+        inventory.wood -= 10;
+        buildSites.push({x: bx, z: bz, type: 'treefarm', progress: 0, maxProgress: 5, built: false});
+        placingBuild = null;
+        placeGhost.visible = false;
+        // Assign idle villagers to help build
+        for (const v of villagers) {
+          if (v.state === 'idle') {
+            v.state = 'build';
+            v.buildTarget = buildSites[buildSites.length - 1];
+            break;
+          }
+        }
+      }
+      leftClick = false;
+    } else if (placingBuild === 'wall' || placingBuild === 'gate') {
+      const dir2 = new THREE.Vector3(0,0,-1).applyEuler(camera.rotation);
+      const hit2 = raycast(camera.position, dir2, 12);
+      if (hit2) {
+        const bx = hit2.x - 2, bz = hit2.z;
+        inventory.wood -= 5;
+        const type = placingBuild;
+        buildSites.push({x: bx, z: bz, type: type, rotation: buildRotation, progress: 0, maxProgress: 3, built: false});
+        placingBuild = null;
+        placeGhost.visible = false;
+        for (const v of villagers) {
+          if (v.state === 'idle') {
+            v.state = 'build';
+            v.buildTarget = buildSites[buildSites.length - 1];
+            break;
+          }
+        }
+      }
+      leftClick = false;
+    } else {
+    const dir=new THREE.Vector3(0,0,-1).applyEuler(camera.rotation);
+    const hit=raycastTree(camera.position,dir,8);
+    if(hit&&(hit.block===BLOCK.WOOD||hit.block===BLOCK.LEAVES)){
+      // Find the base of the tree (trace down to find trunk base)
+      let baseX=hit.x,baseZ=hit.z,baseY=hit.y;
+      // If hit leaves, look for nearby wood
+      if(hit.block===BLOCK.LEAVES){
+        let found=false;
+        for(let dx=-2;dx<=2&&!found;dx++){for(let dz=-2;dz<=2&&!found;dz++){for(let dy=-3;dy<=0&&!found;dy++){
+          if(getBlock(hit.x+dx,hit.y+dy,hit.z+dz)===BLOCK.WOOD){baseX=hit.x+dx;baseZ=hit.z+dz;baseY=hit.y+dy;found=true;}
+        }}}
+      }
+      // Find trunk base (go down to y=2)
+      while(baseY>2&&getBlock(baseX,baseY-1,baseZ)===BLOCK.WOOD)baseY--;
 
-  for (var rvi = 0; rvi < villagers.length; rvi++) {
-    var rv = villagers[rvi];
-    if (rv.hp <= 0 || rv.sleeping) continue;
-    var vsx = Math.round(rv.x - camera.x);
-    var vsy = Math.round(rv.y - camera.y);
-    if (vsx < -20 || vsy < -20 || vsx > viewW + 20 || vsy > viewH + 20) continue;
-    var legSwing = rv.moving ? Math.sin(rv.walkTimer) * 1.5 : 0;
-    if (selectedVillager === rv) {
-      var pulse = 0.5 + Math.sin(gameTime * 5) * 0.3;
-      ctx.strokeStyle = 'rgba(255,255,255,' + pulse + ')';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(vsx - 7, vsy - 14, 14, 24);
-    }
-    // Head
-    ctx.fillStyle = '#c49a6c';
-    ctx.fillRect(vsx - 5, vsy - 12, 10, 10);
-    ctx.fillStyle = '#222';
-    ctx.fillRect(vsx - 3, vsy - 9, 2, 2);
-    ctx.fillRect(vsx + 1, vsy - 9, 2, 2);
-    // Shirt (same for all)
-    ctx.fillStyle = '#6688aa';
-    ctx.fillRect(vsx - 5, vsy - 2, 10, 8);
-    // Legs
-    ctx.fillStyle = '#554433';
-    ctx.fillRect(vsx - 4, vsy + 6, 3, 5 + legSwing);
-    ctx.fillRect(vsx + 1, vsy + 6, 3, 5 - legSwing);
-    // Ability icon above head
-    if (rv.isWarrior) {
-      // Wooden sword icon
-      ctx.fillStyle = '#b8954a';
-      ctx.fillRect(vsx + 5, vsy - 21, 1, 7);
-      ctx.fillStyle = '#9a7a3a';
-      ctx.fillRect(vsx + 4, vsy - 22, 1, 2);
-      ctx.fillStyle = '#6b4a20';
-      ctx.fillRect(vsx + 3, vsy - 15, 5, 1);
-      ctx.fillStyle = '#5a3a1a';
-      ctx.fillRect(vsx + 5, vsy - 14, 1, 3);
-    }
-    if (rv.canMineStone) {
-      // Wooden pickaxe icon
-      var pix = rv.isWarrior ? vsx - 6 : vsx + 3;
-      ctx.fillStyle = '#5a3a1a';
-      ctx.fillRect(pix, vsy - 21, 1, 7);
-      ctx.fillStyle = '#6b4a20';
-      ctx.fillRect(pix + 1, vsy - 22, 1, 2);
-      ctx.fillStyle = '#8a6b3e';
-      ctx.fillRect(pix - 2, vsy - 22, 3, 2);
-      ctx.fillRect(pix + 1, vsy - 23, 2, 2);
-    }
-    // Status text
-    var iconOffset = (rv.isWarrior || rv.canMineStone) ? 8 : 0;
-    if (rv.statusTimer > 0) {
-      ctx.fillStyle = '#fff';
-      ctx.font = '6px monospace';
-      ctx.fillText(rv.statusText, vsx - ctx.measureText(rv.statusText).width / 2, vsy - 18 - iconOffset);
-    }
-    if (rv.hp < rv.maxHp) {
-      ctx.fillStyle = '#500';
-      ctx.fillRect(vsx - 6, vsy - 17 - iconOffset, 12, 2);
-      ctx.fillStyle = '#0a0';
-      ctx.fillRect(vsx - 6, vsy - 17 - iconOffset, 12 * (rv.hp / rv.maxHp), 2);
-    }
-  }
+      // Verify it's a tree, not a house post
+      // Check if this position is a house corner
+      let isHousePost = false;
+      for(const h of HOUSES){
+        const lx=baseX-h.x,lz=baseZ-h.z;
+        if((lx===0||lx===4)&&(lz===0||lz===4)&&lx>=0&&lz>=0){isHousePost=true;break;}
+      }
+      if(isHousePost){leftClick=false;return;}
+      // Must have at least 4 wood blocks tall (trees are 4-6, house posts are 3)
+      let woodHeight=0;
+      for(let cy=baseY;cy<baseY+8;cy++){if(getBlock(baseX,cy,baseZ)===BLOCK.WOOD)woodHeight++;else break;}
+      let isTree=woodHeight>=4;
+      // Also check for leaves above
+      if(!isTree){for(let cy=baseY+2;cy<baseY+8;cy++){for(let lx=-2;lx<=2;lx++){for(let lz=-2;lz<=2;lz++){if(getBlock(baseX+lx,cy,baseZ+lz)===BLOCK.LEAVES)isTree=true;}}}}
+      if (!isTree) { leftClick = false; return; }
 
-  for (var rzri = 0; rzri < zombies.length; rzri++) {
-    var rz = zombies[rzri];
-    if (rz.hp <= 0) continue;
-    var zsx = Math.round(rz.x - camera.x);
-    var zsy = Math.round(rz.y - camera.y);
-    if (zsx < -20 || zsy < -20 || zsx > viewW + 20 || zsy > viewH + 20) continue;
-    var zhurt = rz.hurtTimer > 0;
-    // Minecraft zombie - blocky green guy
-    // Head - bright green
-    ctx.fillStyle = zhurt ? '#ff8888' : '#6a9a5a';
-    ctx.fillRect(zsx - 5, zsy - 12, 10, 10);
-    // Darker green forehead
-    ctx.fillStyle = '#5a8a4a';
-    ctx.fillRect(zsx - 5, zsy - 12, 10, 4);
-    // Eyes - small dark, not too intense
-    ctx.fillStyle = '#2a3a2a';
-    ctx.fillRect(zsx - 3, zsy - 8, 2, 1);
-    ctx.fillRect(zsx + 1, zsy - 8, 2, 1);
-    // Shirt - teal/cyan
-    ctx.fillStyle = zhurt ? '#ff9999' : '#3a8a7a';
-    ctx.fillRect(zsx - 5, zsy - 2, 10, 8);
-    // Pants - indigo
-    ctx.fillStyle = '#3a3a6a';
-    ctx.fillRect(zsx - 4, zsy + 6, 3, 6);
-    ctx.fillRect(zsx + 1, zsy + 6, 3, 6);
-    if (rz.hp < rz.maxHp) {
-      ctx.fillStyle = '#500';
-      ctx.fillRect(zsx - 6, zsy - 16, 12, 2);
-      ctx.fillStyle = '#c00';
-      ctx.fillRect(zsx - 6, zsy - 16, 12 * (rz.hp / rz.maxHp), 2);
+      // Check if tree is already being chopped
+      const treeKey = `${baseX},${baseZ}`;
+      if (choppingTrees.has(treeKey)) { leftClick = false; }
+      else {
+        // Find nearest idle villager
+        let nearest=null,nearDist=Infinity;
+        for(const v of villagers){
+          if(v.state==='chop')continue;
+          const d=Math.sqrt((v.x-baseX)*(v.x-baseX)+(v.z-baseZ)*(v.z-baseZ));
+          if(d<nearDist){nearDist=d;nearest=v;}
+        }
+        if(nearest){
+          nearest.state='chop';
+          nearest.chopTarget={x:baseX+0.5,z:baseZ+0.5,bx:baseX,bz:baseZ};
+          nearest.chopTimer = 0;
+          choppingTrees.add(treeKey);
+        }
+      }
+    }
+    leftClick=false;
     }
   }
-
-  for (var rsri = 0; rsri < skeletons.length; rsri++) {
-    var rs = skeletons[rsri];
-    if (rs.hp <= 0) continue;
-    var ssx = Math.round(rs.x - camera.x);
-    var ssy = Math.round(rs.y - camera.y);
-    if (ssx < -20 || ssy < -20 || ssx > viewW + 20 || ssy > viewH + 20) continue;
-    var shurt = rs.hurtTimer > 0;
-    ctx.fillStyle = shurt ? '#ff8888' : '#e8e0d0';
-    ctx.fillRect(ssx - 4, ssy - 12, 8, 9);
-    ctx.fillStyle = '#222';
-    ctx.fillRect(ssx - 3, ssy - 10, 2, 3);
-    ctx.fillRect(ssx + 1, ssy - 10, 2, 3);
-    ctx.fillRect(ssx, ssy - 7, 1, 2);
-    ctx.fillStyle = '#d0c8b8';
-    ctx.fillRect(ssx - 3, ssy - 4, 6, 2);
-    ctx.fillStyle = shurt ? '#ff8888' : '#e8e0d0';
-    ctx.fillRect(ssx - 4, ssy - 2, 8, 7);
-    ctx.fillStyle = '#bbb';
-    ctx.fillRect(ssx - 3, ssy - 1, 6, 1);
-    ctx.fillRect(ssx - 3, ssy + 1, 6, 1);
-    ctx.fillRect(ssx - 3, ssy + 3, 6, 1);
-    ctx.fillStyle = '#e8e0d0';
-    ctx.fillRect(ssx - 8, ssy - 2, 4, 2);
-    ctx.fillRect(ssx + 4, ssy - 2, 4, 2);
-    ctx.fillStyle = '#6a4a2a';
-    ctx.fillRect(ssx + 8, ssy - 6, 1, 10);
-    ctx.fillStyle = '#aaa';
-    ctx.fillRect(ssx + 9, ssy - 5, 1, 8);
-    ctx.fillStyle = '#e8e0d0';
-    ctx.fillRect(ssx - 3, ssy + 5, 2, 6);
-    ctx.fillRect(ssx + 1, ssy + 5, 2, 6);
-    if (rs.hp < rs.maxHp) {
-      ctx.fillStyle = '#500';
-      ctx.fillRect(ssx - 6, ssy - 16, 12, 2);
-      ctx.fillStyle = '#c00';
-      ctx.fillRect(ssx - 6, ssy - 16, 12 * (rs.hp / rs.maxHp), 2);
-    }
+}
+// Tree respawning — occasionally grow new trees in empty areas
+let treeSpawnTimer=0;
+function trySpawnTree(dt){
+  treeSpawnTimer+=dt;
+  if(treeSpawnTimer<3)return; // check every 3 seconds
+  treeSpawnTimer=0;
+  if(Math.random()>0.4)return; // 40% chance per check
+  // Pick a random position 20-50 blocks from player
+  const ang=Math.random()*Math.PI*2;
+  const dist=20+Math.random()*30;
+  const wx=Math.floor(player.pos.x+Math.cos(ang)*dist);
+  const wz=Math.floor(player.pos.z+Math.sin(ang)*dist);
+  // Must be far from player
+  const dToPlayer=Math.sqrt((wx-player.pos.x)**2+(wz-player.pos.z)**2);
+  if(dToPlayer<20)return;
+  // Must be on grass
+  if(getBlock(wx,1,wz)!==BLOCK.GRASS)return;
+  if(getBlock(wx,2,wz)!==BLOCK.AIR)return;
+  // No trees within 10 blocks
+  for(let dx=-10;dx<=10;dx+=2){for(let dz=-10;dz<=10;dz+=2){
+    if(getBlock(wx+dx,2,wz+dz)===BLOCK.WOOD||getBlock(wx+dx,3,wz+dz)===BLOCK.WOOD)return;
+  }}
+  // Not in protected area
+  if(isProtectedArea(wx,wz))return;
+  // Spawn tree
+  const th=4+Math.floor(Math.random()*3);
+  for(let y=2;y<2+th&&y<WORLD_HEIGHT;y++)setBlock(wx,y,wz,BLOCK.WOOD);
+  const lb=2+th-2;
+  for(let ly=lb;ly<=2+th+1&&ly<WORLD_HEIGHT;ly++){
+    const r=ly<=2+th?2:1;
+    for(let lx=-r;lx<=r;lx++){for(let lz=-r;lz<=r;lz++){
+      if(lx===0&&lz===0&&ly<=2+th)continue;
+      if(Math.abs(lx)===r&&Math.abs(lz)===r&&Math.random()>0.6)continue;
+      if(getBlock(wx+lx,ly,wz+lz)===BLOCK.AIR)setBlock(wx+lx,ly,wz+lz,BLOCK.LEAVES);
+    }}
   }
-
-  for (var rari = 0; rari < arrows.length; rari++) {
-    var ar = arrows[rari];
-    var asx = Math.round(ar.x - camera.x);
-    var asy = Math.round(ar.y - camera.y);
-    var aAngle = Math.atan2(ar.vy, ar.vx);
-    ctx.save();
-    ctx.translate(asx, asy);
-    ctx.rotate(aAngle);
-    ctx.fillStyle = '#8a6a3a';
-    ctx.fillRect(-6, -1, 12, 2);
-    ctx.fillStyle = '#aaa';
-    ctx.fillRect(5, -2, 3, 4);
-    ctx.fillStyle = '#ddd';
-    ctx.fillRect(-7, -2, 2, 1);
-    ctx.fillRect(-7, 1, 2, 1);
-    ctx.restore();
-  }
-
-  if (!player.dead) {
-    var ppx = Math.round(player.x - camera.x);
-    var ppy = Math.round(player.y - camera.y);
-    ctx.beginPath();
-    ctx.arc(ppx, ppy, INTERACT_RADIUS, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    var pLeg = player.moving ? Math.sin(player.walkTimer) * 2 : 0;
-    ctx.fillStyle = '#c49a6c';
-    ctx.fillRect(ppx - 5, ppy - 14, 10, 12);
-    ctx.fillStyle = '#4a2a0a';
-    ctx.fillRect(ppx - 5, ppy - 14, 10, 4);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(ppx - 3, ppy - 9, 2, 3);
-    ctx.fillRect(ppx + 1, ppy - 9, 2, 3);
-    ctx.fillStyle = '#226';
-    ctx.fillRect(ppx - 3, ppy - 8, 2, 2);
-    ctx.fillRect(ppx + 1, ppy - 8, 2, 2);
-    ctx.fillStyle = '#00aaaa';
-    ctx.fillRect(ppx - 5, ppy - 2, 10, 12);
-    ctx.fillStyle = '#335';
-    ctx.fillRect(ppx - 4, ppy + 10, 3, 6 + pLeg);
-    ctx.fillRect(ppx + 1, ppy + 10, 3, 6 - pLeg);
-    if (player.hp < player.maxHp) {
-      ctx.fillStyle = '#500';
-      ctx.fillRect(ppx - 8, ppy - 18, 16, 3);
-      ctx.fillStyle = '#0a0';
-      ctx.fillRect(ppx - 8, ppy - 18, 16 * (player.hp / player.maxHp), 3);
-    }
-  }
-
-  // Off-screen enemy indicators (arrows at screen edge)
-  if (clock.phase === 'night') {
-    var ppxI = Math.round(player.x - camera.x);
-    var ppyI = Math.round(player.y - camera.y);
-    var allEnemies = [];
-    for (var ezi = 0; ezi < zombies.length; ezi++) {
-      if (zombies[ezi].hp > 0) allEnemies.push({ x: zombies[ezi].x, y: zombies[ezi].y, col: '#66ff44' });
-    }
-    for (var esi = 0; esi < skeletons.length; esi++) {
-      if (skeletons[esi].hp > 0) allEnemies.push({ x: skeletons[esi].x, y: skeletons[esi].y, col: '#ffffff' });
-    }
-    for (var aei = 0; aei < allEnemies.length; aei++) {
-      var ae = allEnemies[aei];
-      var aesx = Math.round(ae.x - camera.x);
-      var aesy = Math.round(ae.y - camera.y);
-      // Only draw indicator if off-screen
-      if (aesx >= 0 && aesx <= viewW && aesy >= 0 && aesy <= viewH) continue;
-      var adx = aesx - ppxI, ady = aesy - ppyI;
-      var adist = Math.sqrt(adx * adx + ady * ady);
-      if (adist < 1) continue;
-      var ndx = adx / adist, ndy = ady / adist;
-      // Clamp to screen edge
-      var arrowDist = Math.min(adist, Math.min(viewW, viewH) * 0.4);
-      var arx = ppxI + ndx * arrowDist;
-      var ary = ppyI + ndy * arrowDist;
-      arx = Math.max(10, Math.min(viewW - 10, arx));
-      ary = Math.max(10, Math.min(viewH - 10, ary));
-      // Draw large visible arrow indicator
-      ctx.save();
-      ctx.translate(arx, ary);
-      ctx.rotate(Math.atan2(ndy, ndx));
-      // Black outline
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.moveTo(10, 0);
-      ctx.lineTo(-6, -7);
-      ctx.lineTo(-3, 0);
-      ctx.lineTo(-6, 7);
-      ctx.closePath();
-      ctx.fill();
-      // Colored fill
-      ctx.fillStyle = ae.col;
-      ctx.globalAlpha = 0.9;
-      ctx.beginPath();
-      ctx.moveTo(8, 0);
-      ctx.lineTo(-4, -5);
-      ctx.lineTo(-1, 0);
-      ctx.lineTo(-4, 5);
-      ctx.closePath();
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.restore();
-    }
-  }
-
-  var nightAlpha = getNightTint();
-  if (nightAlpha > 0) {
-    ctx.fillStyle = 'rgba(10,10,40,' + nightAlpha + ')';
-    ctx.fillRect(0, 0, viewW, viewH);
-  }
-  var duskAlpha = getDuskTint();
-  if (duskAlpha > 0) {
-    ctx.fillStyle = 'rgba(200,100,20,' + duskAlpha + ')';
-    ctx.fillRect(0, 0, viewW, viewH);
-  }
-
-  if (gameOver) {
-    ctx.fillStyle = 'rgba(100,0,0,0.6)';
-    ctx.fillRect(0, 0, viewW, viewH);
-    ctx.fillStyle = '#fff';
-    ctx.font = '24px monospace';
-    ctx.fillText('GAME OVER', viewW / 2 - 70, viewH / 2 - 10);
-    ctx.font = '12px monospace';
-    ctx.fillText('All villagers have died!', viewW / 2 - 75, viewH / 2 + 15);
-    ctx.fillText('Survived ' + clock.dayNumber + ' days', viewW / 2 - 60, viewH / 2 + 35);
-  }
-
-  ctx.restore();
-
-  document.getElementById('hud-day').textContent = 'Day ' + clock.dayNumber;
-  document.getElementById('hud-phase').textContent = clock.phase === 'day' ? '\u2600 DAY' : '\u263D NIGHT';
-  document.getElementById('hud-time').textContent = Math.ceil(clock.timeLeft) + 's remaining';
-  document.getElementById('hud-wood').querySelector('span:last-child').textContent = 'Wood: ' + stockpile.wood;
-  document.getElementById('hud-stone').querySelector('span:last-child').textContent = 'Stone: ' + stockpile.stone;
-  document.getElementById('hud-iron').querySelector('span:last-child').textContent = 'Iron: ' + stockpile.iron;
-  var aliveVillagers = 0;
-  for (var hvi = 0; hvi < villagers.length; hvi++) { if (villagers[hvi].hp > 0) aliveVillagers++; }
-  document.getElementById('hud-villagers').querySelector('span:last-child').textContent = 'Villagers: ' + aliveVillagers;
-  var aliveZombies = 0, aliveSkeletons = 0;
-  for (var hzi = 0; hzi < zombies.length; hzi++) { if (zombies[hzi].hp > 0) aliveZombies++; }
-  for (var hsi = 0; hsi < skeletons.length; hsi++) { if (skeletons[hsi].hp > 0) aliveSkeletons++; }
-  var enemyText = '';
-  if (aliveZombies > 0 || aliveSkeletons > 0) {
-    enemyText = '\u2620 ' + (aliveZombies + aliveSkeletons) + ' enemies';
-    if (aliveZombies > 0 && aliveSkeletons > 0) enemyText += ' (' + aliveZombies + 'z/' + aliveSkeletons + 'sk)';
-    else if (aliveZombies > 0) enemyText += ' (zombies)';
-    else enemyText += ' (skeletons)';
-  }
-  document.getElementById('hud-enemies').textContent = enemyText;
-  document.getElementById('hud-pos').textContent = Math.floor(player.x / TILE) + ', ' + Math.floor(player.y / TILE);
+  // Re-place trunk top
+  for(let y=2;y<2+th&&y<WORLD_HEIGHT;y++)setBlock(wx,y,wz,BLOCK.WOOD);
 }
 
-function getNightTint() {
-  if (clock.phase === 'night') {
-    var t = 1 - clock.timeLeft / NIGHT_LENGTH;
-    // Fade in during first 10%, then stay dark until dawn
-    if (t < 0.1) return 0.15 + t * 4.5;
-    // Stay full dark until last 5% when dawn breaks
-    if (t > 0.95) return (1 - t) * 12;
-    return 0.6;
+function gameLoop(){requestAnimationFrame(gameLoop);const dt=Math.min(clock.getDelta(),0.05);update(dt);trySpawnTree(dt);updateParticles(dt);updateBirds(dt);updateAmbientAudio(dt);updateZombieGroans(dt);updateChunks();
+  // Render unfinished builds as transparent ghosts
+  for (const bs of buildSites) {
+    if (bs.built) continue;
+    if (!bs.ghostMesh) {
+      const geo = new THREE.BoxGeometry(5, 4, 5);
+      const mat = new THREE.MeshBasicMaterial({color: 0x88aa44, transparent: true, opacity: 0.25, wireframe: false, depthWrite: false});
+      bs.ghostMesh = new THREE.Mesh(geo, mat);
+      bs.ghostMesh.position.set(bs.x + 2.5, 4, bs.z + 2.5);
+      scene.add(bs.ghostMesh);
+      // Also add wireframe outline
+      const wire = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color:0x44ff44, wireframe:true, transparent:true, opacity:0.5}));
+      wire.position.copy(bs.ghostMesh.position);
+      scene.add(wire);
+      bs.ghostWire = wire;
+    }
   }
-  // Dusk: gradually darken during last 10s of day, only gets darker
-  if (clock.phase === 'day' && clock.timeLeft < 10) return (1 - clock.timeLeft / 10) * 0.15;
-  return 0;
-}
-
-function getDuskTint() {
-  // Orange tint only during dusk approach, fading into night
-  if (clock.phase === 'day' && clock.timeLeft < 15 && clock.timeLeft > 3) {
-    var p = (15 - clock.timeLeft) / 12;
-    return Math.min(p, 1 - p) * 0.2;
+  // Remove ghost meshes for built sites
+  for (const bs of buildSites) {
+    if (bs.built && bs.ghostMesh) { scene.remove(bs.ghostMesh); bs.ghostMesh = null; if(bs.ghostWire){scene.remove(bs.ghostWire);bs.ghostWire=null;} }
   }
-  return 0;
-}
-
-var lastTime = performance.now();
-function gameLoop(now) {
-  var dt = Math.min((now - lastTime) / 1000, 0.05);
-  lastTime = now;
-  update(dt);
-  render();
-  requestAnimationFrame(gameLoop);
-}
-requestAnimationFrame(gameLoop);
+  // No-materials popup timer
+  if(noMatsTimer>0){noMatsTimer-=dt;if(noMatsTimer<=0)document.getElementById('no-mats-msg').style.display='none';}
+  renderer.render(scene,camera);drawCompass();updateHotbar();updateHearts();frameCount++;fpsTime+=dt;if(fpsTime>=1){fps=Math.round(frameCount/fpsTime);frameCount=0;fpsTime=0;}const cx=Math.floor(player.pos.x/CHUNK_SIZE),cz=Math.floor(player.pos.z/CHUNK_SIZE);debugEl.textContent=`FPS: ${fps} | Pos: ${player.pos.x.toFixed(1)}, ${player.pos.y.toFixed(1)}, ${player.pos.z.toFixed(1)} | Chunk: ${cx}, ${cz} | Chunks: ${chunks.size}`;}
+window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+gameLoop();
 </script>
 </body>
 </html>
